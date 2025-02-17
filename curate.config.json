@@ -728,6 +728,12 @@
       "outputs": {
         "stream": {
           "enabled": true,
+          "transform": {
+            "plugin": "@curatedotfun/simple-transform",
+            "config": {
+              "format": "🚢 Shippost 📬\n\n{CONTENT}\n\n{CURATOR_NOTES}\n\n📌 source: https://x.com/x/status/{SUBMISSION_ID}\n"
+            }
+          },
           "distribute": [
             {
               "plugin": "@curatedotfun/telegram",
