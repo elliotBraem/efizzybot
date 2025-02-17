@@ -728,14 +728,16 @@
       "outputs": {
         "stream": {
           "enabled": true,
-          "distribute": [{
-            "plugin": "@curatedotfun/telegram",
-            "config": {
-              "botToken": "{TELEGRAM_BOT_TOKEN}",
-              "channelId": "-1001941128087",
-              "messageThreadId": "11535"
+          "distribute": [
+            {
+              "plugin": "@curatedotfun/telegram",
+              "config": {
+                "botToken": "{TELEGRAM_BOT_TOKEN}",
+                "channelId": "-1001941128087",
+                "messageThreadId": "11535"
+              }
             }
-          }]
+          ]
         }
       }
     },
