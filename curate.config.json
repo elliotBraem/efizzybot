@@ -166,7 +166,7 @@
           "transform": {
             "plugin": "@curatedotfun/simple-transform",
             "config": {
-              "format": "🔥 NEAR Protocol News Flash 🔥\n\n{CONTENT}\n\n{CURATOR_NOTES}\n\n🔗 Source: https://x.com/x/status/{SUBMISSION_ID}\n"
+              "format": "NEAR: {CONTENT}\n\n{CURATOR_NOTES}\n\n🔗 Source: https://x.com/x/status/{SUBMISSION_ID}\n"
             }
           },
           "distribute": [
@@ -316,6 +316,7 @@
             "civilmonkey",
             "potlock_",
             "plutgrel",
+            "TrinityMorphy",
             "potlock_intern",
             "PaulBurg_"
           ]
@@ -629,7 +630,7 @@
           "transform": {
             "plugin": "@curatedotfun/simple-transform",
             "config": {
-              "format": "💰 New Crypto Fundraise 💸\n\n{CONTENT}\n\n{CURATOR_NOTES}\n\n📌 source: https://x.com/x/status/{SUBMISSION_ID}\n"
+              "format": "💰 FUNDRAISE: {CONTENT}\n\n{CURATOR_NOTES}\n\n📌 source: https://x.com/x/status/{SUBMISSION_ID}\n"
             }
           },
           "distribute": [
@@ -731,7 +732,7 @@
           "transform": {
             "plugin": "@curatedotfun/simple-transform",
             "config": {
-              "format": "🚢 Shippost 📬\n\n{CONTENT}\n\n{CURATOR_NOTES}\n\n📌 source: https://x.com/x/status/{SUBMISSION_ID}\n"
+              "format": "🚢 ShippostL {CONTENT}\n\n{CURATOR_NOTES}\n\n📌 source: https://x.com/x/status/{SUBMISSION_ID}\n"
             }
           },
           "distribute": [
