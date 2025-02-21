@@ -965,6 +965,142 @@
         }
       }
     },
+     {
+      "id": "monad",
+      "name": "Monad",
+      "description": "News about Monad Ecoystem",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+         {
+      "id": "story",
+      "name": "Story",
+      "description": "News about Story Protocol Ecoystem",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+         {
+      "id": "arbitrum",
+      "name": "arbitrum",
+      "description": "News about Atrbitrum Ecoystem",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+   {
+      "id": "stablecoins",
+      "name": "Stablecoins",
+      "description": "News about the Stablecoins Ecoystem",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+   {
+      "id": "polkadot",
+      "name": "polkadot",
+      "description": "News about Polkadot Ecoystem",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+     {
+      "id": "cardano",
+      "name": "cardano",
+      "description": "News about Cardano Ecoystem",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+             {
+      "id": "arbitrum",
+      "name": "arbitrum",
+      "description": "News about Arbitrum Ecoystem",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+   {
+      "id": "polygon",
+      "name": "Polygon",
+      "description": "News about Polygon Ecoystem",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+   {
+      "id": "unc",
+      "name": "Unc",
+      "description": "Unc.fun meme curation mechanisms for the YNs",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern", "russlive215"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+    
     {
       "id": "bitcoin",
       "name": "Bitcoin News",
