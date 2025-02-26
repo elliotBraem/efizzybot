@@ -11,7 +11,7 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
-# Copy package files
+# Copy package files for dependency installation
 COPY package.json ./
 COPY frontend/package.json ./frontend/
 COPY backend/package.json ./backend/
@@ -19,17 +19,18 @@ COPY backend/drizzle.config.ts ./backend/
 
 # Install dependencies
 RUN cd frontend && npm install
-RUN cd backend && npm install --workspace=false
+RUN cd backend && npm install
 
-# Copy source code
+# Copy source code after dependency installation
 COPY frontend ./frontend
 COPY backend ./backend
-
-# Build frontend
-RUN cd frontend && npm run build
+COPY curate.config.json ./
 
 # Build backend (rspack will copy frontend dist to backend/dist/public)
 ENV NODE_ENV="production"
+# Build frontend first since backend depends on it
+RUN cd frontend && npm run build
+# Then build backend which will copy frontend dist
 RUN cd backend && npm run build
 
 # Production stage
@@ -60,14 +61,11 @@ RUN mkdir -p /litefs /var/lib/litefs && \
 ENV DATABASE_URL="file:/litefs/db"
 
 # Copy application files
-COPY --from=builder --chown=node:node /app/package.json ./
-COPY --chown=node:node curate.config.json ./
 COPY --from=builder --chown=node:node /app/backend ./backend
+COPY --chown=node:node curate.config.json ./
 
-# Install production dependencies without workspace hoisting
-RUN cd backend && \
-    npm install --workspace=false && \
-    npm rebuild better-sqlite3
+# Install production dependencies
+RUN cd backend && npm install && npm rebuild better-sqlite3
 
 # Copy LiteFS configuration
 COPY --chown=node:node litefs.yml /etc/litefs.yml

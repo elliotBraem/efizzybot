@@ -9,23 +9,18 @@
   "packageManager": "bun@1.0.27",
   "private": true,
   "scripts": {
-    "dev": "bunx turbo run dev",
-    "build": "bunx turbo run build",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
     "start": "cd backend && npm run start",
     "db:up": "cd backend && npm run db:up",
     "db:push": "cd backend && npm run db:push",
     "db:migrate": "cd backend && npm run db:migrate",
-    "lint": "bunx turbo run lint",
+    "lint": "turbo run lint",
     "deploy:init": "fly launch && fly consul attach",
     "deploy": "fly deploy",
     "fmt": "prettier --write '**/*.{js,jsx,ts,tsx,json}'",
     "fmt:check": "prettier --check '**/*.{js,jsx,ts,tsx,json}'",
-    "docs": "bunx turbo run docs"
+    "docs": "turbo run docs"
   },
-  "type": "module",
-  "workspaces": [
-    "frontend",
-    "backend",
-    "docs"
-  ]
+  "type": "module"
 }

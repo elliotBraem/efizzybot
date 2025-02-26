@@ -8,11 +8,20 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "db:push"],
       "outputs": ["dist/**"]
     },
     "lint": {
       "outputs": []
+    },
+    "db:push": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false
+    },
+    "db:up": {
+      "cache": false
     }
   }
 }
