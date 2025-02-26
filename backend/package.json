@@ -7,14 +7,14 @@
     "start": "rspack build && node dist/main.js",
     "dev": "NODE_ENV=development nodemon --exec \"rspack build && node dist/main.js\" --watch src",
     "test": "bun test",
-    "test:watch": "bun test --watch",
-    "db:generate": "bun drizzle-kit generate",
-    "db:migrate": "bun drizzle-kit migrate",
-    "db:push": "bun drizzle-kit push",
-    "db:pull": "bun drizzle-kit pull",
-    "db:check": "bun drizzle-kit check",
-    "db:up": "bun drizzle-kit up",
-    "db:studio": "bun drizzle-kit studio"
+    "test:watch": "npm test --watch",
+    "db:generate": "npm drizzle-kit generate",
+    "db:migrate": "npm drizzle-kit migrate",
+    "db:push": "npm drizzle-kit push",
+    "db:pull": "npm drizzle-kit pull",
+    "db:check": "npm drizzle-kit check",
+    "db:up": "npm drizzle-kit up",
+    "db:studio": "npm drizzle-kit studio"
   },
   "browserslist": {
     "production": [
