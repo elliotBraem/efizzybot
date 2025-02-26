@@ -63,6 +63,7 @@ ENV DATABASE_URL="file:/litefs/db"
 # Copy application files
 COPY --from=builder --chown=node:node /app/backend ./backend
 COPY --chown=node:node curate.config.json ./
+COPY --chown=node:node package.json ./
 
 # Install production dependencies
 RUN cd backend && npm install && npm rebuild better-sqlite3
