@@ -19,7 +19,7 @@ COPY backend/drizzle.config.ts ./backend/
 
 # Install dependencies
 RUN cd frontend && npm install
-RUN cd backend && npm install
+RUN cd backend && npm install --workspace=false
 
 # Copy source code
 COPY frontend ./frontend
@@ -64,9 +64,9 @@ COPY --from=builder --chown=node:node /app/package.json ./
 COPY --chown=node:node curate.config.json ./
 COPY --from=builder --chown=node:node /app/backend ./backend
 
-# Install production dependencies and rebuild better-sqlite3
+# Install production dependencies without workspace hoisting
 RUN cd backend && \
-    npm install && \
+    npm install --workspace=false && \
     npm rebuild better-sqlite3
 
 # Copy LiteFS configuration
