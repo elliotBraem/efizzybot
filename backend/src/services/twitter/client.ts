@@ -22,7 +22,7 @@ export class TwitterService {
 
   private async loadCachedCookies(): Promise<boolean> {
     try {
-      const cachedCookies = this.getCookies();
+      const cachedCookies = await this.getCookies();
       if (!cachedCookies) {
         return false;
       }
@@ -105,8 +105,8 @@ export class TwitterService {
     }
   }
 
-  getCookies() {
-    return db.getTwitterCookies(this.twitterUsername);
+  async getCookies() {
+    return await db.getTwitterCookies(this.twitterUsername);
   }
 
   async initialize() {
@@ -125,14 +125,14 @@ export class TwitterService {
       // First try to use cached cookies
       if (await this.loadCachedCookies()) {
         logger.info("Successfully initialized using cached cookies");
-        this.lastCheckedTweetId = db.getTwitterCacheValue("last_tweet_id");
+        this.lastCheckedTweetId = await db.getTwitterCacheValue("last_tweet_id");
         return;
       }
 
       // If cached cookies failed or don't exist, try fresh login with retries
       for (let attempt = 0; attempt < 3; attempt++) {
         if (await this.performLogin()) {
-          this.lastCheckedTweetId = db.getTwitterCacheValue("last_tweet_id");
+          this.lastCheckedTweetId = await db.getTwitterCacheValue("last_tweet_id");
           return;
         }
 

@@ -1,6 +1,5 @@
 import { TwitterService } from "../../../twitter/client";
 import { logger } from "../../../../utils/logger";
-import { SourcePlugin } from "types/plugins";
 import { PluginEndpoint } from "services/plugins/plugin.service";
 
 interface TwitterConfig extends Record<string, unknown> {
@@ -13,7 +12,7 @@ interface TwitterConfig extends Record<string, unknown> {
 /**
  * Twitter source plugin that monitors Twitter for mentions and submissions
  */
-export class TwitterSourcePlugin implements SourcePlugin<TwitterConfig> {
+export class TwitterSourcePlugin {
   name = "twitter-source";
   version = "0.0.1";
   type = "source" as const;

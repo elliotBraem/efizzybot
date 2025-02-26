@@ -1,5 +1,5 @@
+import { ActionArgs } from "@curatedotfun/types";
 import { PluginError, PluginExecutionError } from "../../types/errors";
-import { ActionArgs } from "../../types/plugins";
 import { TwitterSubmission } from "../../types/twitter";
 import { logger } from "../../utils/logger";
 import { PluginService } from "../plugins/plugin.service";

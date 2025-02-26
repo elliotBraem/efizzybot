@@ -49,7 +49,7 @@ export async function saveSubmissionToFeed(
   status: SubmissionStatus = SubmissionStatus.PENDING,
 ) {
   // Check if submission exists
-  const submission = await db
+  const submission = db
     .select({ id: submissions.tweetId })
     .from(submissions)
     .where(eq(submissions.tweetId, submissionId))
