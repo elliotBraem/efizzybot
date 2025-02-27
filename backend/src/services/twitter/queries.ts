@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { twitterCache, twitterCookies } from "./schema";
-import { BunSQLiteDatabase } from "drizzle-orm/bun-sqlite";
 
 // Twitter Cookie Management
-export function getTwitterCookies(db: BunSQLiteDatabase, username: string) {
+export function getTwitterCookies(db: BetterSQLite3Database, username: string) {
   return db
     .select()
     .from(twitterCookies)
@@ -12,7 +12,7 @@ export function getTwitterCookies(db: BunSQLiteDatabase, username: string) {
 }
 
 export function setTwitterCookies(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   username: string,
   cookiesJson: string,
 ) {
@@ -28,20 +28,27 @@ export function setTwitterCookies(
         cookies: cookiesJson,
         updatedAt: new Date().toISOString(),
       },
-    });
+    })
+    .run();
 }
 
-export function deleteTwitterCookies(db: BunSQLiteDatabase, username: string) {
-  return db.delete(twitterCookies).where(eq(twitterCookies.username, username));
+export function deleteTwitterCookies(
+  db: BetterSQLite3Database,
+  username: string,
+) {
+  return db
+    .delete(twitterCookies)
+    .where(eq(twitterCookies.username, username))
+    .run();
 }
 
 // Twitter Cache Management
-export function getTwitterCacheValue(db: BunSQLiteDatabase, key: string) {
+export function getTwitterCacheValue(db: BetterSQLite3Database, key: string) {
   return db.select().from(twitterCache).where(eq(twitterCache.key, key)).get();
 }
 
 export function setTwitterCacheValue(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   key: string,
   value: string,
 ) {
@@ -57,13 +64,17 @@ export function setTwitterCacheValue(
         value,
         updatedAt: new Date().toISOString(),
       },
-    });
+    })
+    .run();
 }
 
-export function deleteTwitterCacheValue(db: BunSQLiteDatabase, key: string) {
-  return db.delete(twitterCache).where(eq(twitterCache.key, key));
+export function deleteTwitterCacheValue(
+  db: BetterSQLite3Database,
+  key: string,
+) {
+  return db.delete(twitterCache).where(eq(twitterCache.key, key)).run();
 }
 
-export function clearTwitterCache(db: BunSQLiteDatabase) {
-  return db.delete(twitterCache);
+export function clearTwitterCache(db: BetterSQLite3Database) {
+  return db.delete(twitterCache).run();
 }

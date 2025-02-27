@@ -22,7 +22,7 @@ export class TwitterService {
 
   private async loadCachedCookies(): Promise<boolean> {
     try {
-      const cachedCookies = this.getCookies();
+      const cachedCookies = await this.getCookies();
       if (!cachedCookies) {
         return false;
       }
@@ -231,7 +231,7 @@ export class TwitterService {
     }
   }
 
-  async setLastCheckedTweetId(tweetId: string) {
+  setLastCheckedTweetId(tweetId: string) {
     this.lastCheckedTweetId = tweetId;
     db.setTwitterCacheValue("last_tweet_id", tweetId);
     logger.info(`Last checked tweet ID updated to: ${tweetId}`);

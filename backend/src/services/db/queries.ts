@@ -1,12 +1,12 @@
 import { and, eq, sql } from "drizzle-orm";
-import { BunSQLiteDatabase } from "drizzle-orm/bun-sqlite";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import {
   SubmissionFeed,
   Moderation,
   TwitterSubmission,
   SubmissionStatus,
   TwitterSubmissionWithFeedData,
-} from "types/twitter";
+} from "../../types/twitter";
 import {
   feedPlugins,
   feeds,
@@ -18,10 +18,10 @@ import {
 import { DbQueryResult, DbFeedQueryResult } from "./types";
 
 export function upsertFeeds(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   feedsToUpsert: { id: string; name: string; description?: string }[],
 ) {
-  return db.transaction(() => {
+  db.transaction(() => {
     for (const feed of feedsToUpsert) {
       db.insert(feeds)
         .values({
@@ -43,11 +43,33 @@ export function upsertFeeds(
 }
 
 export function saveSubmissionToFeed(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   submissionId: string,
   feedId: string,
   status: SubmissionStatus = SubmissionStatus.PENDING,
 ) {
+  // Check if submission exists
+  const submission = db
+    .select({ id: submissions.tweetId })
+    .from(submissions)
+    .where(eq(submissions.tweetId, submissionId))
+    .get();
+
+  if (!submission) {
+    throw new Error(`Submission with ID ${submissionId} does not exist`);
+  }
+
+  // Check if feed exists
+  const feed = db
+    .select({ id: feeds.id })
+    .from(feeds)
+    .where(eq(feeds.id, feedId))
+    .get();
+
+  if (!feed) {
+    throw new Error(`Feed with ID ${feedId} does not exist`);
+  }
+
   return db
     .insert(submissionFeeds)
     .values({
@@ -55,11 +77,12 @@ export function saveSubmissionToFeed(
       feedId,
       status,
     })
-    .onConflictDoNothing();
+    .onConflictDoNothing()
+    .run();
 }
 
 export function getFeedsBySubmission(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   submissionId: string,
 ): SubmissionFeed[] {
   const results = db
@@ -80,39 +103,45 @@ export function getFeedsBySubmission(
 }
 
 export function saveSubmission(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   submission: TwitterSubmission,
 ) {
-  return db.insert(submissions).values({
-    tweetId: submission.tweetId,
-    userId: submission.userId,
-    username: submission.username,
-    content: submission.content,
-    curatorNotes: submission.curatorNotes,
-    curatorId: submission.curatorId,
-    curatorUsername: submission.curatorUsername,
-    curatorTweetId: submission.curatorTweetId,
-    createdAt: submission.createdAt,
-    submittedAt: submission.submittedAt,
-  });
+  return db
+    .insert(submissions)
+    .values({
+      tweetId: submission.tweetId,
+      userId: submission.userId,
+      username: submission.username,
+      content: submission.content,
+      curatorNotes: submission.curatorNotes,
+      curatorId: submission.curatorId,
+      curatorUsername: submission.curatorUsername,
+      curatorTweetId: submission.curatorTweetId,
+      createdAt: submission.createdAt,
+      submittedAt: submission.submittedAt,
+    })
+    .run();
 }
 
 export function saveModerationAction(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   moderation: Moderation,
 ) {
-  return db.insert(moderationHistory).values({
-    tweetId: moderation.tweetId,
-    feedId: moderation.feedId,
-    adminId: moderation.adminId,
-    action: moderation.action,
-    note: moderation.note,
-    createdAt: moderation.timestamp.toISOString(),
-  });
+  return db
+    .insert(moderationHistory)
+    .values({
+      tweetId: moderation.tweetId,
+      feedId: moderation.feedId,
+      adminId: moderation.adminId,
+      action: moderation.action,
+      note: moderation.note,
+      createdAt: moderation.timestamp.toISOString(),
+    })
+    .run();
 }
 
 export function getModerationHistory(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   tweetId: string,
 ): Moderation[] {
   const results = db
@@ -149,7 +178,7 @@ export function getModerationHistory(
 }
 
 export function updateSubmissionFeedStatus(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   submissionId: string,
   feedId: string,
   status: SubmissionStatus,
@@ -167,11 +196,12 @@ export function updateSubmissionFeedStatus(
         eq(submissionFeeds.submissionId, submissionId),
         eq(submissionFeeds.feedId, feedId),
       ),
-    );
+    )
+    .run();
 }
 
 export function getSubmissionByCuratorTweetId(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   curatorTweetId: string,
 ): TwitterSubmission | null {
   const results = db
@@ -245,7 +275,7 @@ export function getSubmissionByCuratorTweetId(
 }
 
 export function getSubmission(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   tweetId: string,
 ): TwitterSubmission | null {
   const results = db
@@ -318,7 +348,11 @@ export function getSubmission(
   };
 }
 
-export function getAllSubmissions(db: BunSQLiteDatabase): TwitterSubmission[] {
+export function getAllSubmissions(
+  db: BetterSQLite3Database,
+  limit: number = 50,
+  offset: number = 0,
+): TwitterSubmission[] {
   const results = db
     .select({
       s: {
@@ -356,6 +390,8 @@ export function getAllSubmissions(db: BunSQLiteDatabase): TwitterSubmission[] {
       ),
     )
     .orderBy(moderationHistory.createdAt)
+    .limit(limit)
+    .offset(offset)
     .all() as DbQueryResult[];
 
   // Group results by submission
@@ -397,16 +433,17 @@ export function getAllSubmissions(db: BunSQLiteDatabase): TwitterSubmission[] {
 }
 
 export function cleanupOldSubmissionCounts(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   date: string,
 ) {
   return db
     .delete(submissionCounts)
-    .where(sql`${submissionCounts.lastResetDate} < ${date}`);
+    .where(sql`${submissionCounts.lastResetDate} < ${date}`)
+    .run();
 }
 
 export function getDailySubmissionCount(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   userId: string,
   date: string,
 ): number {
@@ -425,7 +462,7 @@ export function getDailySubmissionCount(
 }
 
 export function incrementDailySubmissionCount(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   userId: string,
 ) {
   const today = new Date().toISOString().split("T")[0];
@@ -446,11 +483,12 @@ export function incrementDailySubmissionCount(
         END`,
         lastResetDate: today,
       },
-    });
+    })
+    .run();
 }
 
 export function removeFromSubmissionFeed(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   submissionId: string,
   feedId: string,
 ) {
@@ -461,12 +499,13 @@ export function removeFromSubmissionFeed(
         eq(submissionFeeds.submissionId, submissionId),
         eq(submissionFeeds.feedId, feedId),
       ),
-    );
+    )
+    .run();
 }
 
 // Feed Plugin queries
 export function getFeedPlugin(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   feedId: string,
   pluginId: string,
 ) {
@@ -480,7 +519,7 @@ export function getFeedPlugin(
 }
 
 export function upsertFeedPlugin(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   feedId: string,
   pluginId: string,
   config: Record<string, any>,
@@ -498,11 +537,12 @@ export function upsertFeedPlugin(
         config: JSON.stringify(config),
         updatedAt: new Date().toISOString(),
       },
-    });
+    })
+    .run();
 }
 
 export function getSubmissionsByFeed(
-  db: BunSQLiteDatabase,
+  db: BetterSQLite3Database,
   feedId: string,
 ): (TwitterSubmission & {
   status: SubmissionStatus;

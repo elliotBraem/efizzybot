@@ -9,67 +9,81 @@ import {
 import { logger } from "../../utils/logger";
 import { db } from "../db";
 import { TwitterService } from "../twitter/client";
-import { DistributionService } from "./../distribution/distribution.service";
+import { ProcessorService } from "../processor/processor.service";
 
 export class SubmissionService {
-  private checkInterval: NodeJS.Timer | null = null;
+  private checkInterval: NodeJS.Timeout | null = null;
   private adminIdCache: Map<string, string> = new Map();
 
   constructor(
     private readonly twitterService: TwitterService,
-    private readonly DistributionService: DistributionService,
+    private readonly processorService: ProcessorService,
     private readonly config: AppConfig,
   ) {}
 
   private async initializeAdminIds(): Promise<void> {
-    // Try to load admin IDs from cache first
-    const cachedAdminIds = db.getTwitterCacheValue("admin_ids");
-    if (cachedAdminIds) {
-      try {
-        const adminMap = JSON.parse(cachedAdminIds);
-        for (const [userId, handle] of Object.entries(adminMap)) {
-          this.adminIdCache.set(userId, handle as string);
+    try {
+      // Try to load admin IDs from cache first
+      const cachedAdminIds = db.getTwitterCacheValue("admin_ids");
+      if (cachedAdminIds) {
+        try {
+          const adminMap = JSON.parse(cachedAdminIds);
+          for (const [userId, handle] of Object.entries(adminMap)) {
+            this.adminIdCache.set(userId, handle as string);
+          }
+          logger.info("Loaded admin IDs from cache");
+          return;
+        } catch (error) {
+          logger.error("Failed to parse cached admin IDs:", error);
         }
-        logger.info("Loaded admin IDs from cache");
-        return;
-      } catch (error) {
-        logger.error("Failed to parse cached admin IDs:", error);
       }
-    }
 
-    // If no cache or parse error, fetch and cache admin IDs
-    const adminHandles = new Set<string>();
-    for (const feed of this.config.feeds) {
-      for (const handle of feed.moderation.approvers.twitter) {
-        adminHandles.add(handle);
+      // If no cache or parse error, fetch and cache admin IDs
+      const adminHandles = new Set<string>();
+      for (const feed of this.config.feeds) {
+        for (const handle of feed.moderation.approvers.twitter) {
+          adminHandles.add(handle);
+        }
       }
-    }
 
-    logger.info("Fetching admin IDs for the first time...");
-    const adminMap: Record<string, string> = {};
+      logger.info("Fetching admin IDs for the first time...");
+      const adminMap: Record<string, string> = {};
 
-    for (const handle of adminHandles) {
-      try {
-        const userId = await this.twitterService.getUserIdByScreenName(handle);
-        this.adminIdCache.set(userId, handle);
-        adminMap[userId] = handle;
-      } catch (error) {
-        logger.error(`Failed to fetch ID for admin handle @${handle}:`, error);
+      for (const handle of adminHandles) {
+        try {
+          const userId =
+            await this.twitterService.getUserIdByScreenName(handle);
+          this.adminIdCache.set(userId, handle);
+          adminMap[userId] = handle;
+        } catch (error) {
+          logger.error(
+            `Failed to fetch ID for admin handle @${handle}:`,
+            error,
+          );
+        }
       }
-    }
 
-    // Cache the admin IDs
-    db.setTwitterCacheValue("admin_ids", JSON.stringify(adminMap));
-    logger.info("Cached admin IDs for future use");
+      // Cache the admin IDs
+      db.setTwitterCacheValue("admin_ids", JSON.stringify(adminMap));
+      logger.info("Cached admin IDs for future use");
+    } catch (error) {
+      logger.error("Failed to initialize admin IDs:", error);
+      throw error;
+    }
   }
 
   private initializeFeeds(): void {
-    const feedsToUpsert = this.config.feeds.map((feed) => ({
-      id: feed.id,
-      name: feed.name,
-      description: feed.description,
-    }));
-    db.upsertFeeds(feedsToUpsert);
+    try {
+      const feedsToUpsert = this.config.feeds.map((feed) => ({
+        id: feed.id,
+        name: feed.name,
+        description: feed.description,
+      }));
+      db.upsertFeeds(feedsToUpsert);
+    } catch (error) {
+      logger.error("Failed to initialize feeds:", error);
+      throw error;
+    }
   }
 
   async initialize(): Promise<void> {
@@ -201,9 +215,7 @@ export class SubmissionService {
       // Check if this tweet was already submitted
       const existingSubmission = db.getSubmission(originalTweet.id!);
       const existingFeeds = existingSubmission
-        ? (db.getFeedsBySubmission(
-            existingSubmission.tweetId,
-          ) as SubmissionFeed[])
+        ? db.getFeedsBySubmission(existingSubmission.tweetId)
         : [];
 
       // Create new submission if it doesn't exist
@@ -296,9 +308,9 @@ export class SubmissionService {
             );
 
             if (feed.outputs.stream?.enabled) {
-              await this.DistributionService.processStreamOutput(
-                feed.id,
+              await this.processorService.process(
                 existingSubmission || submission!,
+                feed.outputs.stream,
               );
             }
           }
@@ -334,9 +346,9 @@ export class SubmissionService {
             );
 
             if (feed.outputs.stream?.enabled) {
-              await this.DistributionService.processStreamOutput(
-                feed.id,
+              await this.processorService.process(
                 existingSubmission || submission!,
+                feed.outputs.stream,
               );
             }
           }
@@ -401,9 +413,7 @@ export class SubmissionService {
     }
 
     // Get submission feeds to determine which feed is being moderated
-    const submissionFeeds = db.getFeedsBySubmission(
-      submission.tweetId,
-    ) as SubmissionFeed[];
+    const submissionFeeds = db.getFeedsBySubmission(submission.tweetId);
     const pendingFeeds = submissionFeeds
       .filter((feed) => feed.status === SubmissionStatus.PENDING)
       .filter((feed) => {
@@ -466,9 +476,9 @@ export class SubmissionService {
           );
 
           if (feed.outputs.stream?.enabled) {
-            await this.DistributionService.processStreamOutput(
-              pendingFeed.feedId,
+            await this.processorService.process(
               submission,
+              feed.outputs.stream,
             );
           }
         }
@@ -512,7 +522,6 @@ export class SubmissionService {
   }
 
   private getModerationAction(tweet: Tweet): "approve" | "reject" | null {
-    const hashtags = tweet.hashtags?.map((tag) => tag.toLowerCase()) || [];
     const text = tweet.text?.toLowerCase() || "";
     if (text.includes("!approve")) return "approve";
     if (text.includes("!reject")) return "reject";

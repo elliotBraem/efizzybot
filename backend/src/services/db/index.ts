@@ -1,32 +1,52 @@
-import { Database } from "bun:sqlite";
-import { BunSQLiteDatabase, drizzle } from "drizzle-orm/bun-sqlite";
-import { join } from "node:path";
+import Database from "better-sqlite3";
+import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
+import { join } from "path";
 
-import { logger } from "utils/logger";
+import { logger } from "../../utils/logger";
 
 import { DBOperations } from "./operations";
 import * as queries from "./queries";
 
 // Twitter & RSS
 import {
-  SubmissionFeed,
   Moderation,
+  SubmissionFeed,
+  SubmissionStatus,
   TwitterCookie,
   TwitterSubmission,
-  SubmissionStatus,
-} from "types/twitter";
+} from "../../types/twitter";
 import * as rssQueries from "../rss/queries";
 import * as twitterQueries from "../twitter/queries";
 export class DatabaseService {
-  private db: BunSQLiteDatabase;
+  private db: BetterSQLite3Database;
   private operations: DBOperations;
-  private static readonly DB_PATH =
-    process.env.DATABASE_URL?.replace("file:", "") ||
-    join(".db", "submissions.sqlite");
+  private static readonly DB_PATH = (() => {
+    const url = process.env.DATABASE_URL;
+    if (url) {
+      try {
+        new URL(url);
+        return url;
+      } catch (e: any) {
+        throw new Error(`Invalid DATABASE_URL: ${url}`);
+      }
+    }
+    return `file:${join(process.cwd(), ".db", "submissions.sqlite")}`;
+  })();
 
   constructor() {
-    const sqlite = new Database(DatabaseService.DB_PATH, { create: true });
-    this.db = drizzle(sqlite);
+    try {
+      const dbPath = DatabaseService.DB_PATH.replace("file:", "");
+      const sqlite = new Database(dbPath);
+      this.db = drizzle(sqlite);
+    } catch (e: any) {
+      logger.error("Failed to initialize database:", {
+        error: e,
+        path: DatabaseService.DB_PATH,
+        dirname: __dirname,
+        cwd: process.cwd(),
+      });
+      throw new Error(`Database initialization failed: ${e.message}`);
+    }
     this.operations = new DBOperations(this.db);
   }
 
@@ -35,11 +55,11 @@ export class DatabaseService {
   }
 
   saveSubmission(submission: TwitterSubmission): void {
-    queries.saveSubmission(this.db, submission).run();
+    queries.saveSubmission(this.db, submission);
   }
 
   saveModerationAction(moderation: Moderation): void {
-    queries.saveModerationAction(this.db, moderation).run();
+    queries.saveModerationAction(this.db, moderation);
   }
 
   updateSubmissionFeedStatus(
@@ -48,15 +68,13 @@ export class DatabaseService {
     status: SubmissionStatus,
     moderationResponseTweetId: string,
   ): void {
-    queries
-      .updateSubmissionFeedStatus(
-        this.db,
-        submissionId,
-        feedId,
-        status,
-        moderationResponseTweetId,
-      )
-      .run();
+    queries.updateSubmissionFeedStatus(
+      this.db,
+      submissionId,
+      feedId,
+      status,
+      moderationResponseTweetId,
+    );
   }
 
   getSubmission(tweetId: string): TwitterSubmission | null {
@@ -69,19 +87,19 @@ export class DatabaseService {
     return queries.getSubmissionByCuratorTweetId(this.db, curatorTweetId);
   }
 
-  getAllSubmissions(): TwitterSubmission[] {
-    return queries.getAllSubmissions(this.db);
+  getAllSubmissions(limit?: number, offset?: number): TwitterSubmission[] {
+    return queries.getAllSubmissions(this.db, limit, offset);
   }
 
   getDailySubmissionCount(userId: string): number {
     const today = new Date().toISOString().split("T")[0];
     // Clean up old entries first
-    queries.cleanupOldSubmissionCounts(this.db, today).run();
+    queries.cleanupOldSubmissionCounts(this.db, today);
     return queries.getDailySubmissionCount(this.db, userId, today);
   }
 
   incrementDailySubmissionCount(userId: string): void {
-    queries.incrementDailySubmissionCount(this.db, userId).run();
+    queries.incrementDailySubmissionCount(this.db, userId);
   }
 
   upsertFeeds(
@@ -95,7 +113,7 @@ export class DatabaseService {
     feedId: string,
     status: SubmissionStatus = SubmissionStatus.PENDING,
   ): void {
-    queries.saveSubmissionToFeed(this.db, submissionId, feedId, status).run();
+    queries.saveSubmissionToFeed(this.db, submissionId, feedId, status);
   }
 
   getFeedsBySubmission(submissionId: string): SubmissionFeed[] {
@@ -103,7 +121,7 @@ export class DatabaseService {
   }
 
   removeFromSubmissionFeed(submissionId: string, feedId: string): void {
-    queries.removeFromSubmissionFeed(this.db, submissionId, feedId).run();
+    queries.removeFromSubmissionFeed(this.db, submissionId, feedId);
   }
 
   getSubmissionsByFeed(
@@ -122,60 +140,105 @@ export class DatabaseService {
     pluginId: string,
     config: Record<string, any>,
   ) {
-    return queries.upsertFeedPlugin(this.db, feedId, pluginId, config).run();
+    return queries.upsertFeedPlugin(this.db, feedId, pluginId, config);
   }
 
   // Twitter Cookie Management
   setTwitterCookies(username: string, cookies: TwitterCookie[] | null): void {
-    const cookiesJson = JSON.stringify(cookies);
-    twitterQueries.setTwitterCookies(this.db, username, cookiesJson).run();
+    try {
+      const cookiesJson = JSON.stringify(cookies);
+      twitterQueries.setTwitterCookies(this.db, username, cookiesJson);
+    } catch (error: any) {
+      logger.error("Failed to set Twitter cookies:", { error, username });
+      throw new Error(`Failed to set Twitter cookies: ${error.message}`);
+    }
   }
 
   getTwitterCookies(username: string): TwitterCookie[] | null {
-    const result = twitterQueries.getTwitterCookies(this.db, username);
-    if (!result) return null;
-
     try {
+      const result = twitterQueries.getTwitterCookies(this.db, username);
+      if (!result) return null;
+
       return JSON.parse(result.cookies) as TwitterCookie[];
-    } catch (e) {
-      logger.error("Error parsing Twitter cookies:", e);
-      return null;
+    } catch (error: any) {
+      logger.error("Error getting Twitter cookies:", { error, username });
+      throw new Error(`Failed to get Twitter cookies: ${error.message}`);
     }
   }
 
   deleteTwitterCookies(username: string): void {
-    twitterQueries.deleteTwitterCookies(this.db, username).run();
+    try {
+      twitterQueries.deleteTwitterCookies(this.db, username);
+    } catch (error: any) {
+      logger.error("Failed to delete Twitter cookies:", { error, username });
+      throw new Error(`Failed to delete Twitter cookies: ${error.message}`);
+    }
   }
 
   // Twitter Cache Management
   setTwitterCacheValue(key: string, value: string): void {
-    twitterQueries.setTwitterCacheValue(this.db, key, value).run();
+    try {
+      twitterQueries.setTwitterCacheValue(this.db, key, value);
+    } catch (error: any) {
+      logger.error("Failed to set Twitter cache value:", { error, key });
+      throw new Error(`Failed to set Twitter cache value: ${error.message}`);
+    }
   }
 
   getTwitterCacheValue(key: string): string | null {
-    const result = twitterQueries.getTwitterCacheValue(this.db, key);
-    return result?.value ?? null;
+    try {
+      const result = twitterQueries.getTwitterCacheValue(this.db, key);
+      return result?.value ?? null;
+    } catch (error: any) {
+      logger.error("Failed to get Twitter cache value:", { error, key });
+      throw new Error(`Failed to get Twitter cache value: ${error.message}`);
+    }
   }
 
   deleteTwitterCacheValue(key: string): void {
-    twitterQueries.deleteTwitterCacheValue(this.db, key).run();
+    try {
+      twitterQueries.deleteTwitterCacheValue(this.db, key);
+    } catch (error: any) {
+      logger.error("Failed to delete Twitter cache value:", { error, key });
+      throw new Error(`Failed to delete Twitter cache value: ${error.message}`);
+    }
   }
 
   clearTwitterCache(): void {
-    twitterQueries.clearTwitterCache(this.db).run();
+    try {
+      twitterQueries.clearTwitterCache(this.db);
+    } catch (error: any) {
+      logger.error("Failed to clear Twitter cache:", { error });
+      throw new Error(`Failed to clear Twitter cache: ${error.message}`);
+    }
   }
 
   // RSS Management
   saveRssItem(feedId: string, item: rssQueries.RssItem): void {
-    rssQueries.saveRssItem(this.db, feedId, item).run();
+    try {
+      rssQueries.saveRssItem(this.db, feedId, item);
+    } catch (error: any) {
+      logger.error("Failed to save RSS item:", { error, feedId });
+      throw new Error(`Failed to save RSS item: ${error.message}`);
+    }
   }
 
   getRssItems(feedId: string, limit?: number): rssQueries.RssItem[] {
-    return rssQueries.getRssItems(this.db, feedId, limit);
+    try {
+      return rssQueries.getRssItems(this.db, feedId, limit);
+    } catch (error: any) {
+      logger.error("Failed to get RSS items:", { error, feedId });
+      throw new Error(`Failed to get RSS items: ${error.message}`);
+    }
   }
 
   deleteOldRssItems(feedId: string, limit: number): void {
-    rssQueries.deleteOldRssItems(this.db, feedId, limit).run();
+    try {
+      rssQueries.deleteOldRssItems(this.db, feedId, limit);
+    } catch (error: any) {
+      logger.error("Failed to delete old RSS items:", { error, feedId });
+      throw new Error(`Failed to delete old RSS items: ${error.message}`);
+    }
   }
 }
 
