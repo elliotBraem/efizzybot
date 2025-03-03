@@ -71,6 +71,9 @@ Sync content to Notion databases with customizable properties.
 #### [💾 Supabase Plugin](./distributors/supabase.md)
 Store and manage content in your Supabase database.
 
+#### [🌐 NEAR Social Plugin](./distributors/near-social.md)
+Post curated content to NEAR Social, a decentralized social network on the NEAR Protocol.
+
 ### Transformers
 
 #### [🤖 AI Transform](./transformers/ai-transform.md)

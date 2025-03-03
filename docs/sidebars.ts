@@ -75,6 +75,11 @@ const sidebars: SidebarsConfig = {
               id: "plugins/distributors/notion",
               label: "📝 Notion",
             },
+            {
+              type: "doc",
+              id: "plugins/distributors/near-social",
+              label: "🌐 NEAR Social",
+            },
           ],
         },
         {
