@@ -51,7 +51,8 @@
             "TheDevanshMehta",
             "potlock_",
             "bbeats1",
-            "elliot_braem"
+            "elliot_braem",
+            "potlock_intern"
           ]
         }
       },
@@ -836,7 +837,7 @@
       "description": "Fundraising announcements",
       "moderation": {
         "approvers": {
-          "twitter": ["plugrel"]
+          "twitter": ["potlock_intern", "plugrel"]
         }
       },
       "outputs": {
