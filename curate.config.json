@@ -1114,7 +1114,7 @@
               "plugin": "@curatedotfun/rss",
               "config": {
                 "serviceUrl": "shippost-rss.up.railway.app",
-                "apiSecret": "{API_SECRET}"
+                "apiSecret": "{SHIPPOST_RSS_API_SECRET}"
               }
             }
           ]
