@@ -1493,7 +1493,6 @@
         }
       }
     },
-
     {
       "id": "bitcoin",
       "name": "Bitcoin News",
@@ -1506,6 +1505,92 @@
       "outputs": {
         "stream": {
           "enabled": false
+        }
+      }
+    },
+    {
+      "id": "climate",
+      "name": "Climate Current",
+      "description": "Real-time feed for the latest in climate science, policy, and action.",
+      "moderation": {
+        "approvers": {
+          "twitter": ["elliot_braem"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": true,
+          "transform": [
+            {
+              "plugin": "@curatedotfun/object-transform",
+              "config": {
+                "mappings": {
+                  "source": "https://x.com/{{username}}/status/{{tweetId}}",
+                  "content": "{{content}}",
+                  "author": "{{username}}",
+                  "notes": "{{curator.notes}}",
+                  "submittedAt": "{{submittedAt}}",
+                  "createdAt": "{{createdAt}}"
+                }
+              }
+            },
+            {
+              "plugin": "@curatedotfun/ai-transform",
+              "config": {
+                "prompt": "Summarize the content into a concise climate news flash, highlighting key environmental impacts, policy developments, or sustainability efforts. Incorporate relevant details from the curator's notes while maintaining a neutral, third-person tone. Mention the author if relevant, or focus on the core climate-related information.",
+                "apiKey": "{OPENROUTER_API_KEY}",
+                "schema": {
+                  "title": {
+                    "type": "string",
+                    "description": "Title derived from summary of content"
+                  },
+                  "summary": {
+                    "type": "string",
+                    "description": "Summary of content influenced by curator notes"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Relevant tags for the content"
+                  }
+                }
+              }
+            }
+          ],
+          "distribute": [
+            {
+              "transform": [
+                {
+                  "plugin": "@curatedotfun/object-transform",
+                  "config": {
+                    "mappings": {
+                      "title": "{{title}}",
+                      "content": "<h2>{{title}}</h2><p>{{summary}}</p>",
+                      "description": "{{summary}}",
+                      "link": "{{source}}",
+                      "publishedAt": "{{createdAt}}",
+                      "author": {
+                        "name": "{{username}}",
+                        "link": "https://x.com/{{author}}"
+                      },
+                      "categories": ["near", "{{tags}}"],
+                      "source": {
+                        "url": "{{source}}",
+                        "title": "twitter"
+                      }
+                    }
+                  }
+                }
+              ],
+              "plugin": "@curatedotfun/rss",
+              "config": {
+                "serviceUrl": "https://climate-rss.up.railway.app",
+                "apiSecret": "{CLIMATE_RSS_API_SECRET}"
+              }
+            }
+          ]
         }
       }
     }
