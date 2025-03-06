@@ -1113,7 +1113,7 @@
               ],
               "plugin": "@curatedotfun/rss",
               "config": {
-                "serviceUrl": "http://localhost:4001",
+                "serviceUrl": "shippost-rss.up.railway.app",
                 "apiSecret": "{API_SECRET}"
               }
             }
