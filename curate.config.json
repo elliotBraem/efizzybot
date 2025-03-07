@@ -1097,7 +1097,6 @@
                       "content": "<h2>{{title}}</h2><p>{{summary}}</p>",
                       "description": "{{summary}}",
                       "link": "{{source}}",
-                      "publishedAt": "{{createdAt}}",
                       "author": {
                         "name": "{{username}}",
                         "link": "https://x.com/{{author}}"
@@ -1570,7 +1569,6 @@
                       "content": "<h2>{{title}}</h2><p>{{summary}}</p>",
                       "description": "{{summary}}",
                       "link": "{{source}}",
-                      "publishedAt": "{{createdAt}}",
                       "author": {
                         "name": "{{username}}",
                         "link": "https://x.com/{{author}}"
