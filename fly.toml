@@ -13,7 +13,7 @@ primary_region = 'den'
   PORT = '3000'
 
 [[mounts]]
-  source = 'litefs'
+  source = 'litefs_restore'
   destination = '/var/lib/litefs'
   initial_size = '1GB'
 
