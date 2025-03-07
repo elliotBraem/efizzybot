@@ -38,6 +38,12 @@ const Header = () => {
               Test Panel
             </Link>
           )}
+          <Link
+              to="/leaderboard"
+              className="text-gray-600 hover:text-black transition-colors"
+            >
+              Leaderboard
+          </Link>
         </div>
         <nav className="flex space-x-4 mx-4">
           <a
