@@ -1508,6 +1508,51 @@
       }
     },
     {
+      "id": "cryptojobs",
+      "name": "Crypto Jobs",
+      "description": "Decentralized crypto job board",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "ton",
+      "name": "TON",
+      "description": "Telegram's blockchain aka The Open Network ecosystem updates",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "cryptohacks",
+      "name": "Crypto Hacks",
+      "description": "Catalog of all crypto hacks",
+      "moderation": {
+        "approvers": {
+          "twitter": ["plugrel", "potlock_intern"]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+    {
       "id": "climate",
       "name": "Climate Current",
       "description": "Real-time feed for the latest in climate science, policy, and action.",
