@@ -20,11 +20,19 @@ statsRoutes.get("/", async (c) => {
   // Get other stats from config
   const feedsCount = config.feeds.length;
 
-  // Count unique distributions from config
-  const distributionPlugins = Object.values(config.plugins).filter(
-    (plugin) => plugin.type === "distributor",
-  );
-  const distributionsCount = distributionPlugins.length;
+  // Count total distributions from all feeds' distribute arrays
+  let distributionsCount = 0;
+  config.feeds.forEach(feed => {
+    // Count stream distributions if enabled
+    if (feed.outputs.stream?.enabled && feed.outputs.stream.distribute) {
+      distributionsCount += feed.outputs.stream.distribute.length;
+    }
+    
+    // // Count recap distributions if enabled
+    // if (feed.outputs.recap?.enabled && feed.outputs.recap.distribute) {
+    //   distributionsCount += feed.outputs.recap.distribute.length;
+    // }
+  });
 
   return c.json({
     postsCount,
