@@ -20,7 +20,7 @@ const ALLOWED_ORIGINS = [
   "http://localhost:5173", // Dev server
   "http://localhost:3001", // Local landing page
   "https://curatedotfun-floral-sun-1539.fly.dev",
-  "https://curate.fun",
+  "https://www.curate.fun", // Landing page
 ];
 
 export async function createApp(): Promise<AppInstance> {
