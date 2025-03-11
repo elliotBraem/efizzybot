@@ -22,12 +22,12 @@ statsRoutes.get("/", async (c) => {
 
   // Count total distributions from all feeds' distribute arrays
   let distributionsCount = 0;
-  config.feeds.forEach(feed => {
+  config.feeds.forEach((feed) => {
     // Count stream distributions if enabled
     if (feed.outputs.stream?.enabled && feed.outputs.stream.distribute) {
       distributionsCount += feed.outputs.stream.distribute.length;
     }
-    
+
     // // Count recap distributions if enabled
     // if (feed.outputs.recap?.enabled && feed.outputs.recap.distribute) {
     //   distributionsCount += feed.outputs.recap.distribute.length;
