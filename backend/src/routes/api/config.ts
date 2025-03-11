@@ -1,7 +1,28 @@
 import { HonoApp } from "../../types/app";
+import { logger } from "../../utils/logger";
 
 // Create config routes
 const router = HonoApp();
+
+/**
+ * Reload the application configuration from disk
+ */
+router.post("/reload", async (c) => {
+  try {
+    const context = c.get("context");
+    const config = await context.configService.loadConfig();
+    
+    // Reinitialize the submission service to update admin IDs and feeds
+    if (context.submissionService) {
+      await context.submissionService.initialize();
+      logger.info("Reinitialized submission service with updated configuration");
+    }
+    
+    return c.json({ success: true, message: "Configuration reloaded successfully", config });
+  } catch (error) {
+    return c.json({ success: false, message: `Failed to reload configuration: ${error}` }, 500);
+  }
+});
 
 /**
  * Get the full application configuration
