@@ -2,6 +2,7 @@ import { ActionArgs } from "@curatedotfun/types";
 import { PluginError, PluginExecutionError } from "../../types/errors";
 import { TwitterSubmission } from "../../types/twitter";
 import { logger } from "../../utils/logger";
+import { sanitizeJson } from "../../utils/sanitize";
 import { PluginService } from "../plugins/plugin.service";
 import { DistributorConfig } from "./../../types/config";
 
@@ -12,6 +13,8 @@ export class DistributionService {
     distributor: DistributorConfig,
     input: T,
   ): Promise<void> {
+    const sanitizedInput = sanitizeJson(input) as T;
+
     const { plugin: pluginName, config: pluginConfig } = distributor;
     try {
       const plugin = await this.pluginService.getPlugin<"distributor", T>(
@@ -24,7 +27,7 @@ export class DistributionService {
 
       try {
         const args: ActionArgs<T, Record<string, unknown>> = {
-          input,
+          input: sanitizedInput,
           config: pluginConfig,
         };
         await plugin.distribute(args);
@@ -37,10 +40,13 @@ export class DistributionService {
       }
     } catch (error) {
       // Log but don't crash on plugin errors
-      logger.error(`Error distributing content with plugin ${pluginName}:`, {
-        error,
-        pluginName,
-      });
+      logger.error(
+        `Error distributing content with plugin ${pluginName}: ${JSON.stringify(input)}`,
+        {
+          error,
+          pluginName,
+        },
+      );
 
       // Only throw if it's not a plugin error (system error)
       if (!(error instanceof PluginError)) {
