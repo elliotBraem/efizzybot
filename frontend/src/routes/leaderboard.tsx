@@ -1,21 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import Layout from "../components/Layout";
 import LeaderBoard from "../components/LeaderBoard";
+import LayoutCustom from "../components/LayoutCustom";
 
 export const Route = createFileRoute("/leaderboard")({
   component: LeaderBoardPage,
 });
 
 function LeaderBoardPage() {
-
-  if (process.env.NODE_ENV === "production") {
-    return null;
-  }
-
   return (
-    <Layout>
+    <LayoutCustom>
       <LeaderBoard />
-    </Layout>
+    </LayoutCustom>
   );
 }
