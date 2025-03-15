@@ -13,6 +13,7 @@ import {
   SubmissionStatus,
   TwitterCookie,
   TwitterSubmission,
+  TwitterSubmissionWithFeedData,
 } from "../../types/twitter";
 import * as twitterQueries from "../twitter/queries";
 export class DatabaseService {
@@ -79,8 +80,8 @@ export class DatabaseService {
     return queries.getSubmissionByCuratorTweetId(this.db, curatorTweetId);
   }
 
-  getAllSubmissions(limit?: number, offset?: number): TwitterSubmission[] {
-    return queries.getAllSubmissions(this.db, limit, offset);
+  getAllSubmissions(status?: string): TwitterSubmissionWithFeedData[] {
+    return queries.getAllSubmissions(this.db, status);
   }
 
   getDailySubmissionCount(userId: string): number {
@@ -211,6 +212,24 @@ export class DatabaseService {
     } catch (error: any) {
       logger.error("Failed to get leaderboard:", { error });
       throw new Error(`Failed to get leaderboard: ${error.message}`);
+    }
+  }
+
+  getPostsCount(): number {
+    try {
+      return queries.getPostsCount(this.db);
+    } catch (error: any) {
+      logger.error("Failed to get posts count:", { error });
+      return 0;
+    }
+  }
+
+  getCuratorsCount(): number {
+    try {
+      return queries.getCuratorsCount(this.db);
+    } catch (error: any) {
+      logger.error("Failed to get curators count:", { error });
+      return 0;
     }
   }
 }

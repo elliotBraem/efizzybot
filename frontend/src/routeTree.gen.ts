@@ -15,7 +15,8 @@ import { Route as TestImport } from './routes/test'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as LeaderboardImport } from './routes/leaderboard'
 import { Route as IndexImport } from './routes/index'
-import { Route as FeedFeedIdImport } from './routes/feed.$feedId'
+import { Route as FeedIndexImport } from './routes/feed/index'
+import { Route as FeedFeedIdImport } from './routes/feed/$feedId'
 
 // Create/Update Routes
 
@@ -40,6 +41,12 @@ const LeaderboardRoute = LeaderboardImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FeedIndexRoute = FeedIndexImport.update({
+  id: '/feed/',
+  path: '/feed/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -88,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedFeedIdImport
       parentRoute: typeof rootRoute
     }
+    '/feed/': {
+      id: '/feed/'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -99,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/test': typeof TestRoute
   '/feed/$feedId': typeof FeedFeedIdRoute
+  '/feed': typeof FeedIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -107,6 +122,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/test': typeof TestRoute
   '/feed/$feedId': typeof FeedFeedIdRoute
+  '/feed': typeof FeedIndexRoute
 }
 
 export interface FileRoutesById {
@@ -116,13 +132,20 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/test': typeof TestRoute
   '/feed/$feedId': typeof FeedFeedIdRoute
+  '/feed/': typeof FeedIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/leaderboard' | '/settings' | '/test' | '/feed/$feedId'
+  fullPaths:
+    | '/'
+    | '/leaderboard'
+    | '/settings'
+    | '/test'
+    | '/feed/$feedId'
+    | '/feed'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/leaderboard' | '/settings' | '/test' | '/feed/$feedId'
+  to: '/' | '/leaderboard' | '/settings' | '/test' | '/feed/$feedId' | '/feed'
   id:
     | '__root__'
     | '/'
@@ -130,6 +153,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/test'
     | '/feed/$feedId'
+    | '/feed/'
   fileRoutesById: FileRoutesById
 }
 
@@ -139,6 +163,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   TestRoute: typeof TestRoute
   FeedFeedIdRoute: typeof FeedFeedIdRoute
+  FeedIndexRoute: typeof FeedIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -147,6 +172,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   TestRoute: TestRoute,
   FeedFeedIdRoute: FeedFeedIdRoute,
+  FeedIndexRoute: FeedIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -163,7 +189,8 @@ export const routeTree = rootRoute
         "/leaderboard",
         "/settings",
         "/test",
-        "/feed/$feedId"
+        "/feed/$feedId",
+        "/feed/"
       ]
     },
     "/": {
@@ -179,7 +206,10 @@ export const routeTree = rootRoute
       "filePath": "test.tsx"
     },
     "/feed/$feedId": {
-      "filePath": "feed.$feedId.tsx"
+      "filePath": "feed/$feedId.tsx"
+    },
+    "/feed/": {
+      "filePath": "feed/index.tsx"
     }
   }
 }

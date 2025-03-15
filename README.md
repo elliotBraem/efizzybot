@@ -5,7 +5,7 @@
 
 <div align="center">
 
-<img src="landing-page/public/meta.png" alt="curate.fun banner" width="100%" />
+<img src="https://www.curate.fun/meta.png" alt="curate.fun banner" width="100%" />
 
 <h1 style="font-size: 2.5rem; font-weight: bold;">curate.fun</h1>
 
@@ -158,8 +158,6 @@ This project uses a monorepo structure managed with [Turborepo](https://turbo.bu
 curatedotfun/
 ├── frontend/          # React frontend application (app.curate.fun)
 ├── backend/           # Node.js backend service (app.curate.fun)
-├── docs/              # Documentation website (docs.curate.fun)
-├── landing/           # Landing page website (curate.fun)
 ├── package.json       # Root package.json for shared dependencies
 └── turbo.json         # Turborepo configuration
 ```
@@ -199,7 +197,7 @@ npm run build
 
 ### Deploying
 
-For deployment instructions, see our [Deployment Guide](./docs/docs/developers/deployment.md).
+For deployment instructions, see our [Deployment Guide](https://docs.curate.fun/docs/developers/deployment).
 
 ### Running tests
 

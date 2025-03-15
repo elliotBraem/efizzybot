@@ -81,6 +81,4 @@ frontend/**/*.sw?
 fly.toml
 
 # workspace
-landing-page
-docs
 .github
