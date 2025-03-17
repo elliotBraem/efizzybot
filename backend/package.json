@@ -36,9 +36,9 @@
   "devDependencies": {
     "@curatedotfun/types": "^0.0.5",
     "@module-federation/node": "^2.6.22",
+    "@rspack/binding": "1.2.6",
     "@rspack/cli": "1.2.6",
     "@rspack/core": "1.2.6",
-    "@rspack/binding": "1.2.6",
     "@types/axios": "^0.14.0",
     "@types/better-sqlite3": "^7.6.9",
     "@types/nock": "^11.1.0",
@@ -63,14 +63,15 @@
     "@hono/zod-validator": "^0.1.11",
     "@notionhq/client": "^2.2.15",
     "@types/lodash": "^4.17.16",
+    "@types/pg": "^8.11.11",
     "agent-twitter-client": "^0.0.16",
-    "better-sqlite3": "11.8.1",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.1",
-    "drizzle-orm": "^0.38.3",
+    "drizzle-orm": "^0.40.1",
     "hono": "^4.0.5",
     "lodash": "^4.17.21",
     "ora": "^8.1.1",
+    "pg": "^8.14.1",
     "winston": "^3.17.0",
     "winston-console-format": "^1.0.8"
   }

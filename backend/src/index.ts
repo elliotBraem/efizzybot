@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { serve } from "@hono/node-server";
-import { AppInstance, createApp } from "./app";
+import { createApp } from "./app";
 import {
   cleanup,
   failSpinner,
@@ -8,6 +8,8 @@ import {
   startSpinner,
   succeedSpinner,
 } from "./utils/logger";
+import { AppInstance } from "types/app";
+import { db, initializeDatabase } from "./services/db";
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -28,6 +30,18 @@ async function getInstance(): Promise<AppInstance> {
 async function startServer() {
   try {
     startSpinner("server", "Starting server...");
+
+    // Initialize database in production, but not in tests
+    if (process.env.NODE_ENV !== 'test') {
+      startSpinner("database", "Initializing database...");
+      const dbInitialized = await initializeDatabase();
+      if (dbInitialized) {
+        succeedSpinner("database", "Database initialized");
+      } else {
+        failSpinner("database", "Failed to initialize database");
+        logger.warn("Continuing without database connection");
+      }
+    }
 
     const { app, context } = await getInstance();
 
@@ -76,6 +90,8 @@ async function startServer() {
           shutdownPromises.push(context.submissionService.stop());
         if (context.distributionService)
           shutdownPromises.push(context.distributionService.shutdown());
+        
+        shutdownPromises.push(db.disconnect());
 
         await Promise.all(shutdownPromises);
         succeedSpinner("shutdown", "Shutdown complete");
