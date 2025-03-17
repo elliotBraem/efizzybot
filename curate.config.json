@@ -181,7 +181,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🔷 Ethereum: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🔷 Ethereum: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -262,7 +262,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🐉  NEAR: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🐉  NEAR: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -355,7 +355,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🧠 AI3: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🧠 AI3: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -418,7 +418,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🤖 AI: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🤖 AI: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -627,7 +627,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "⚡ Solana: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "⚡ Solana: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -743,7 +743,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "⚡ Eigen News: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "⚡ Eigen News: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -850,7 +850,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "*{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "*{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -924,7 +924,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "⚡ *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "⚡ *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -987,7 +987,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🍑: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🍑: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1135,7 +1135,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "💰 Crypto Fundraise 💸: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "💰 Crypto Fundraise 💸: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1198,7 +1198,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🇺🇸 USA: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🇺🇸 USA: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1311,7 +1311,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🚢 Shippost: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🚢 Shippost: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1327,7 +1327,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🚢 Shippost: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🚢 Shippost: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1476,7 +1476,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🌊 Sui: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🌊 Sui: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1743,7 +1743,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "*{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "*{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
