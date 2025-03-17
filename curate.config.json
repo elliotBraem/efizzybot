@@ -850,7 +850,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🌐🤝 How to DAO News: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "*{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
                   }
                 }
               ],
@@ -924,7 +924,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "⚡ Chain Abstraction: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "⚡ *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
                   }
                 }
               ],
@@ -987,7 +987,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🍑 ANUS Update: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "🍑: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
                   }
                 }
               ],
@@ -1135,7 +1135,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "💰 New Crypto Fundraise 💸: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
+                    "template": "💰 Crypto Fundraise 💸: *{{title}}*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})\n🔗 [Read More](<{{source}}>)"
                   }
                 }
               ],
