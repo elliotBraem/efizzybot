@@ -45,6 +45,8 @@
 - [x] Responsive design
 
 ### In Progress
+- [ ] PostgreSQL migration from SQLite
+- [ ] Docker-based development environment
 - [ ] Recap functionality
 - [ ] Enhanced analytics
 - [ ] Additional distributor plugins
@@ -52,11 +54,15 @@
 - [ ] Testing infrastructure overhaul
 
 ## Next Actions
-1. Complete recap functionality
-2. Implement performance monitoring
-3. Expand distributor options
-4. Enhance transformation capabilities
-5. Implement comprehensive testing strategy based on Node.js best practices
+1. Complete PostgreSQL migration
+   - Set up Docker Compose for development
+   - Migrate data from SQLite
+   - Update database service implementation
+   - Configure testing environment
+2. Complete recap functionality
+3. Implement performance monitoring
+4. Expand distributor options
+5. Enhance transformation capabilities
 
 ## Known Issues
 - None critical - System is stable and operational

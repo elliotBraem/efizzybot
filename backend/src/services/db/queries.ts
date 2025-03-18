@@ -213,7 +213,7 @@ export async function getSubmissionByCuratorTweetId(
         curatorUsername: submissions.curatorUsername,
         curatorTweetId: submissions.curatorTweetId,
         createdAt: submissions.createdAt,
-        submittedAt: sql<string>`COALESCE(${submissions.submittedAt}, ${submissions.createdAt})`,
+        submittedAt: sql<string>`COALESCE(${submissions.submittedAt}::text, ${submissions.createdAt}::text)`,
       },
       m: {
         tweetId: moderationHistory.tweetId,
@@ -286,7 +286,7 @@ export async function getSubmission(
         curatorUsername: submissions.curatorUsername,
         curatorTweetId: submissions.curatorTweetId,
         createdAt: submissions.createdAt,
-        submittedAt: sql<string>`COALESCE(${submissions.submittedAt}, ${submissions.createdAt})`,
+        submittedAt: sql<string>`COALESCE(${submissions.submittedAt}::text, ${submissions.createdAt}::text)`,
       },
       m: {
         tweetId: moderationHistory.tweetId,
@@ -361,7 +361,7 @@ export async function getAllSubmissions(
             curatorUsername: submissions.curatorUsername,
             curatorTweetId: submissions.curatorTweetId,
             createdAt: submissions.createdAt,
-            submittedAt: sql<string>`COALESCE(${submissions.submittedAt}, ${submissions.createdAt})`,
+            submittedAt: sql<string>`COALESCE(${submissions.submittedAt}::text, ${submissions.createdAt}::text)`,
           },
           m: {
             tweetId: moderationHistory.tweetId,
@@ -408,7 +408,7 @@ export async function getAllSubmissions(
             curatorUsername: submissions.curatorUsername,
             curatorTweetId: submissions.curatorTweetId,
             createdAt: submissions.createdAt,
-            submittedAt: sql<string>`COALESCE(${submissions.submittedAt}, ${submissions.createdAt})`,
+            submittedAt: sql<string>`COALESCE(${submissions.submittedAt}::text, ${submissions.createdAt}::text)`,
           },
           m: {
             tweetId: moderationHistory.tweetId,
@@ -806,7 +806,7 @@ export async function getSubmissionsByFeed(
         curatorUsername: submissions.curatorUsername,
         curatorTweetId: submissions.curatorTweetId,
         createdAt: submissions.createdAt,
-        submittedAt: sql<string>`COALESCE(${submissions.submittedAt}, ${submissions.createdAt})`,
+        submittedAt: sql<string>`COALESCE(${submissions.submittedAt}::text, ${submissions.createdAt}::text)`,
       },
       sf: {
         status: submissionFeeds.status,

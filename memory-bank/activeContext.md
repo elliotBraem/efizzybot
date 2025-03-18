@@ -1,7 +1,7 @@
 # Active Context
 
 ## Current Focus
-Platform Stability and Feature Enhancement
+Platform Stability, Database Migration, and Feature Enhancement
 
 ### Background
 - Successfully operating with Node.js/Hono backend
@@ -16,7 +16,13 @@ Platform Stability and Feature Enhancement
    - Maintaining plugin compatibility
    - Optimizing resource usage
 
-2. **Feature Enhancement**
+2. **Database Migration**
+   - Migrating from SQLite to PostgreSQL with Drizzle ORM
+   - Implementing Docker-based development environment
+   - Creating data migration scripts
+   - Setting up testing infrastructure with isolated test databases
+
+3. **Feature Enhancement**
    - Expanding distributor plugins
    - Improving transformation capabilities
    - Enhancing curator experience
@@ -34,6 +40,8 @@ Platform Stability and Feature Enhancement
 - Maintaining plugin compatibility
 - Balancing performance and features
 - **JSON sanitization throughout transformation pipeline**
+- **Database scalability and performance with PostgreSQL**
+- **Consistent development environment with Docker**
 
 ## Active Decisions
 
@@ -46,7 +54,12 @@ Platform Stability and Feature Enhancement
    - Fast package management
    - Excellent developer experience
    - Strong workspace support
-3. **Improved Backend Organization**
+3. **PostgreSQL with Drizzle ORM**
+   - Improved scalability over SQLite
+   - Read/write separation capability
+   - Transaction support with retry logic
+   - Docker-based development environment
+4. **Improved Backend Organization**
    - Modular route structure
    - Dedicated utility for secure file serving
    - Path traversal protection
@@ -66,17 +79,18 @@ Platform Stability and Feature Enhancement
 
 ## Current Focus Areas
 1. System reliability and performance
-2. Plugin ecosystem expansion
-3. Curator experience improvement
-4. Documentation maintenance
-5. **Testing infrastructure overhaul**
+2. Database migration to PostgreSQL
+3. Plugin ecosystem expansion
+4. Curator experience improvement
+5. Documentation maintenance
 
 ## Next Steps
-1. Enhance recap functionality
-2. Expand distributor options
-3. Improve transformation capabilities
-4. Optimize resource usage
-5. **Implement comprehensive testing strategy**
+1. Complete PostgreSQL migration
+2. Implement Docker-based development environment
+3. Enhance recap functionality
+4. Expand distributor options
+5. Improve transformation capabilities
+6. Optimize resource usage
 
 ## Validated Solutions
 1. Twitter-based submission and moderation

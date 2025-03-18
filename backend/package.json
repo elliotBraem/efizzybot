@@ -5,6 +5,7 @@
     "build": "rspack build",
     "start": "node dist/main.js",
     "dev": "NODE_ENV=development nodemon --exec \"rspack build && node dist/main.js\" --watch src",
+    "dev:pg": "NODE_ENV=development DATABASE_URL=postgresql://postgres:postgres@localhost:5432/curatedotfun nodemon --exec \"rspack build && node dist/main.js\" --watch src",
     "test": "bun test",
     "test:watch": "npm test --watch",
     "test:unit": "bun test test/unit",
@@ -19,7 +20,11 @@
     "db:pull": "drizzle-kit pull",
     "db:check": "drizzle-kit check",
     "db:up": "drizzle-kit up",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:migrate-sqlite-to-pg": "bun run ./scripts/migrate-sqlite-to-postgres.js",
+    "docker:up": "cd .. && docker-compose up -d",
+    "docker:down": "cd .. && docker-compose down",
+    "docker:reset": "cd .. && docker-compose down -v && docker-compose up -d"
   },
   "browserslist": {
     "production": [
@@ -62,9 +67,11 @@
     "@hono/zod-openapi": "^0.9.5",
     "@hono/zod-validator": "^0.1.11",
     "@notionhq/client": "^2.2.15",
+    "@types/async-retry": "^1.4.9",
     "@types/lodash": "^4.17.16",
     "@types/pg": "^8.11.11",
     "agent-twitter-client": "^0.0.16",
+    "async-retry": "^1.3.3",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.1",
     "drizzle-orm": "^0.40.1",

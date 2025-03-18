@@ -6,7 +6,7 @@
 - **Runtime**: Node.js (production), Bun (development)
 - **Framework**: Hono
 - **Language**: TypeScript
-- **Database**: SQLite with better-sqlite3 (with DB service abstraction)
+- **Database**: PostgreSQL with Drizzle ORM (with DB service abstraction)
 - **Build Tool**: RSPack
 
 ### Frontend
@@ -44,6 +44,10 @@
   * NODE_ENV
   * PORT
   * LOG_LEVEL
+- Database Settings
+  * DATABASE_URL
+  * DATABASE_WRITE_URL (optional for read/write separation)
+  * DATABASE_READ_URL (optional for read/write separation)
 - Twitter Auth
   * TWITTER_USERNAME
   * TWITTER_PASSWORD
@@ -138,7 +142,8 @@
 
 ### Infrastructure
 - Fly.io deployment
-- LiteFS for SQLite replication
+- PostgreSQL database
+- Docker-based development environment
 - Health check endpoint
 - Graceful shutdown handling
 
@@ -166,6 +171,13 @@
   * Reusable patterns
   * Performance optimization
   * Error boundaries
+
+### Development Environment
+- Docker Compose for local development
+- PostgreSQL container with persistent volume
+- Automatic migrations on startup
+- Seed data scripts
+- Hot-reloading for development
 
 ### Testing Strategy
 - Unit Testing
