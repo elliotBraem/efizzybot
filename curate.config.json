@@ -181,7 +181,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🔷 Ethereum: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "🔷 Ethereum: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -262,7 +262,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🐉  NEAR: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "🐉  NEAR: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -355,7 +355,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🧠 AI3: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "🧠 AI3: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -418,7 +418,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🤖 AI: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "🤖 AI: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -627,7 +627,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "⚡ Solana: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "⚡ Solana: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -743,7 +743,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "⚡ Eigen News: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "🥩 Eigen: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -850,7 +850,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "*{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "*[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -924,7 +924,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "⚡ *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "⚡ *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -987,7 +987,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🍑: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "🍑: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1191,7 +1191,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "💰 Crypto Fundraise 💸: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "💰 Crypto Fundraise: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1430,7 +1430,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🚢 Shippost: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "🚢 Shippost: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1446,7 +1446,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🚢 Shippost: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "🚢 Shippost: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
@@ -1595,7 +1595,7 @@
                 {
                   "plugin": "@curatedotfun/simple-transform",
                   "config": {
-                    "template": "🌊 Sui: *{{title}}*\n🔗 [Link](<{{source}}>)\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
+                    "template": "🌊 Sui: *[{{title}}](<{{source}}>)*\n\n{{summary}}\n\n👤 Source [@{{author}}](https://x.com/{{author}})"
                   }
                 }
               ],
