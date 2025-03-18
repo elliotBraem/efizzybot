@@ -1,7 +1,7 @@
 # Active Context
 
 ## Current Focus
-Platform Stability, Database Migration, and Feature Enhancement
+Platform Stability, Database Migration, Turborepo Conversion, and Feature Enhancement
 
 ### Background
 - Successfully operating with Node.js/Hono backend
@@ -22,13 +22,21 @@ Platform Stability, Database Migration, and Feature Enhancement
    - Creating data migration scripts
    - Setting up testing infrastructure with isolated test databases
 
-3. **Feature Enhancement**
+3. **Turborepo Conversion** ✓
+   - Configuring proper workspace support for Bun ✓
+   - Implementing Corepack for package manager versioning ✓
+   - Optimizing Turborepo configuration for better caching ✓
+   - Setting up integration testing for backend services ✓
+   - Improving Docker configuration for Turborepo ✓
+   - Implementing CI/CD with GitHub Actions ✓
+
+4. **Feature Enhancement**
    - Expanding distributor plugins
    - Improving transformation capabilities
    - Enhancing curator experience
    - Developing recap functionality
 
-3. **Documentation Maintenance**
+5. **Documentation Maintenance**
    - Keeping API documentation current
    - Updating plugin development guides
    - Maintaining deployment documentation
@@ -42,6 +50,9 @@ Platform Stability, Database Migration, and Feature Enhancement
 - **JSON sanitization throughout transformation pipeline**
 - **Database scalability and performance with PostgreSQL**
 - **Consistent development environment with Docker**
+- **Optimized build and development workflow with Turborepo**
+- **Integration testing for backend services with Docker**
+- **Automated testing with GitHub Actions**
 
 ## Active Decisions
 
@@ -50,10 +61,11 @@ Platform Stability, Database Migration, and Feature Enhancement
    - Stable and reliable
    - Good performance characteristics
    - Native module compatibility
-2. Bun for development
+2. Bun for development and package management
    - Fast package management
    - Excellent developer experience
    - Strong workspace support
+   - Managed via Corepack for version consistency
 3. **PostgreSQL with Drizzle ORM**
    - Improved scalability over SQLite
    - Read/write separation capability
@@ -64,6 +76,11 @@ Platform Stability, Database Migration, and Feature Enhancement
    - Dedicated utility for secure file serving
    - Path traversal protection
    - Proper MIME type handling
+5. **Turborepo for Monorepo Management**
+   - Optimized task execution and caching
+   - Workspace-aware dependency management
+   - Improved development workflow
+   - Integration testing infrastructure
 
 ### Plugin System
 - Runtime module federation for plugins
@@ -80,17 +97,21 @@ Platform Stability, Database Migration, and Feature Enhancement
 ## Current Focus Areas
 1. System reliability and performance
 2. Database migration to PostgreSQL
-3. Plugin ecosystem expansion
-4. Curator experience improvement
-5. Documentation maintenance
+3. ~~Turborepo conversion and optimization~~ ✓
+4. ~~Integration testing implementation~~ ✓
+5. Plugin ecosystem expansion
+6. Curator experience improvement
+7. Documentation maintenance
 
 ## Next Steps
-1. Complete PostgreSQL migration
-2. Implement Docker-based development environment
-3. Enhance recap functionality
-4. Expand distributor options
-5. Improve transformation capabilities
-6. Optimize resource usage
+1. ~~Complete Turborepo conversion~~ ✓
+2. Complete PostgreSQL migration
+3. ~~Implement integration testing for backend services~~ ✓
+4. ~~Optimize Docker configuration for production~~ ✓
+5. Enhance recap functionality
+6. Expand distributor options
+7. Improve transformation capabilities
+8. Optimize resource usage
 
 ## Validated Solutions
 1. Twitter-based submission and moderation

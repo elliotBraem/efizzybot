@@ -28,6 +28,7 @@
 ### Core Dependencies
 - Node.js (runtime in production)
 - Bun (package manager and development runtime)
+- Corepack (package manager version management)
 - TypeScript (5.x+)
 - Hono (latest)
 - React (18.x)
@@ -190,6 +191,9 @@
   * Plugin interactions
   * Service integration
   * Event handling
+  * Mock submission and distribution testing
+  * Backend service mocking
+  * Docker-based PostgreSQL testing
 - E2E Testing
   * User flows
   * Plugin workflows
@@ -200,9 +204,34 @@
   * Stress testing
   * Memory profiling
   * Bottleneck identification
+- CI/CD Testing
+  * GitHub Actions workflow
+  * Docker-based test execution
+  * Automated test runs on pull requests and main branch
 
 ### Project Structure
 - Monorepo with Turborepo
-- Backend and Frontend
+  * Optimized task execution and caching
+  * Workspace-aware dependency management
+  * Bun workspace configuration
+  * Integration testing setup
+- Backend and Frontend as separate workspaces
 - Shared types and utilities
 - Documentation as a separate package
+- GitHub Actions workflows for CI/CD
+
+### Monorepo Configuration
+- Turborepo for build orchestration and caching
+- Bun workspaces for dependency management
+- Corepack for package manager version consistency
+- Optimized Docker configuration for monorepo
+- Integration testing infrastructure
+- Docker-based test execution
+
+### Docker Configuration
+- Multi-stage build process for optimized images
+- Alpine-based images for smaller size
+- Turborepo pruning for minimal build context
+- Dedicated test directory with testing infrastructure
+- Docker Compose setup for local development and testing
+- GitHub Actions integration for CI/CD

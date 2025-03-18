@@ -35,18 +35,30 @@ services:
   # app:
   #   build:
   #     context: .
-  #     dockerfile: Dockerfile.dev
+  #     dockerfile: Dockerfile
   #   depends_on:
   #     postgres:
   #       condition: service_healthy
   #   environment:
   #     DATABASE_URL: postgresql://postgres:postgres@postgres:5432/curatedotfun
-  #     NODE_ENV: development
-  #   volumes:
-  #     - ./:/app
+  #     NODE_ENV: production
   #   ports:
   #     - "3000:3000"
-  #   command: bun run dev
+
+  # Test service for running tests against PostgreSQL
+  # test:
+  #   build:
+  #     context: .
+  #     dockerfile: test/Dockerfile
+  #   depends_on:
+  #     postgres_test:
+  #       condition: service_healthy
+  #   environment:
+  #     DATABASE_URL: postgresql://postgres:postgres@postgres_test:5432/test
+  #     NODE_ENV: test
+  #   volumes:
+  #     - ./backend/src/__tests__:/app/backend/src/__tests__
+  #     - ./test:/app/test
 
 volumes:
   postgres_data:

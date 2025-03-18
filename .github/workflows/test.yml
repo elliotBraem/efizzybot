@@ -1,0 +1,26 @@
+name: Tests
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Start PostgreSQL and run tests
+        run: |
+          # Build and run the test service with Docker Compose
+          docker-compose up --build --exit-code-from test test
+        env:
+          # Set environment variables for the test
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@postgres_test:5432/test

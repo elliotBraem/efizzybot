@@ -1,4 +1,13 @@
-import "dotenv/config";
+// Load environment variables from the appropriate .env file
+import { config } from 'dotenv';
+import path from 'path';
+
+if (process.env.NODE_ENV === 'test') {
+  config({ path: path.resolve(process.cwd(), 'backend/.env.test') });
+} else {
+  config();
+}
+
 import { serve } from "@hono/node-server";
 import { createApp } from "./app";
 import {

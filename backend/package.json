@@ -4,8 +4,7 @@
   "scripts": {
     "build": "rspack build",
     "start": "node dist/main.js",
-    "dev": "NODE_ENV=development nodemon --exec \"rspack build && node dist/main.js\" --watch src",
-    "dev:pg": "NODE_ENV=development DATABASE_URL=postgresql://postgres:postgres@localhost:5432/curatedotfun nodemon --exec \"rspack build && node dist/main.js\" --watch src",
+    "dev": "nodemon --exec \"rspack build && node dist/main.js\" --watch src",
     "test": "bun test",
     "test:watch": "npm test --watch",
     "test:unit": "bun test test/unit",
@@ -14,6 +13,7 @@
     "test:e2e": "bun test test/e2e",
     "test:setup": "bun test/setup/global-setup.ts",
     "test:teardown": "bun test/setup/global-teardown.ts",
+    "clean": "rm -rf dist coverage .turbo",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
