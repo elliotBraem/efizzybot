@@ -30,8 +30,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Optional application service
-  # Uncomment to run the application in Docker
+  # Application service
   app:
     build:
       context: .
@@ -41,7 +40,8 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/curatedotfun
-      NODE_ENV: production
+    env_file:
+      - ./backend/.env
     ports:
       - "3000:3000"
 
