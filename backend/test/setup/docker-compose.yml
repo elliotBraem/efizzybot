@@ -1,12 +1,19 @@
-version: '3.6'
 services:
-  # No database service needed as we're using SQLite
-  # We can add other services here if needed in the future
-  # For example, Redis when it's implemented
-  
-  # Example for future Redis implementation:
-  # redis:
-  #   image: redis:alpine
-  #   ports:
-  #     - '63790:6379'
-  #   command: redis-server --appendonly yes
+  postgres_test:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test
+    ports:
+      - "54321:5432"  # Using a different port to avoid conflicts
+    tmpfs: /var/lib/postgresql/data  # Use tmpfs for faster tests and no persistence
+    command: postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off -c random_page_cost=1.0
+    volumes:
+      - ../../scripts/init-db:/docker-entrypoint-initdb.d  # Mount initialization scripts
+      - ./seed:/seed  # Mount seed data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5

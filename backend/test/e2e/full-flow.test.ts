@@ -71,7 +71,7 @@ describe("Full Flow E2E", () => {
       .reply(200, { success: true });
 
     // Act - Submit tweet
-    const submissionResponse = await apiClient.post("/api/twitter/mention", {
+    const submissionResponse = await apiClient.post("/api/test/twitter/mention", {
       tweet: curatorTweet,
     });
 
@@ -90,7 +90,7 @@ describe("Full Flow E2E", () => {
 
     // Act - Approve submission
     const moderatorTweet = createMockModeratorTweet(curatorTweet.id, "approve");
-    const approvalResponse = await apiClient.post("/api/twitter/mention", {
+    const approvalResponse = await apiClient.post("/api/test/twitter/mention", {
       tweet: moderatorTweet,
     });
 
@@ -124,7 +124,7 @@ describe("Full Flow E2E", () => {
       // Submit and approve each tweet
       const curatorTweet = createMockCuratorTweet(tweet.id);
 
-      await apiClient.post("/api/twitter/mention", {
+      await apiClient.post("/api/test/twitter/mention", {
         tweet: curatorTweet,
       });
 
@@ -144,7 +144,7 @@ describe("Full Flow E2E", () => {
         curatorTweet.id,
         "approve",
       );
-      await apiClient.post("/api/twitter/mention", {
+      await apiClient.post("/api/test/twitter/mention", {
         tweet: moderatorTweet,
       });
     }

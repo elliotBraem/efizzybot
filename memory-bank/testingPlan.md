@@ -421,7 +421,7 @@ describe('Submission Flow', () => {
       .reply(200, tweet);
     
     // Act
-    const response = await apiClient.post('/api/twitter/mention', {
+    const response = await apiClient.post('/api/test/twitter/mention', {
       tweet: curatorTweet,
     });
     
@@ -532,7 +532,7 @@ describe('Full Flow', () => {
       .reply(200);
     
     // Act - Submit tweet
-    const submissionResponse = await apiClient.post('/api/twitter/mention', {
+    const submissionResponse = await apiClient.post('/api/test/twitter/mention', {
       tweet: curatorTweet,
     });
     
@@ -541,7 +541,7 @@ describe('Full Flow', () => {
     
     // Act - Approve submission
     const moderatorTweet = createMockModeratorTweet(curatorTweet.id, 'approve');
-    const approvalResponse = await apiClient.post('/api/twitter/mention', {
+    const approvalResponse = await apiClient.post('/api/test/twitter/mention', {
       tweet: moderatorTweet,
     });
     

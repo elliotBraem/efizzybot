@@ -1,7 +1,6 @@
 /**
  * Test data factories for generating test data
  */
-import { SubmissionStatus } from "../../src/types/twitter";
 
 /**
  * Creates a mock tweet for testing
@@ -44,7 +43,7 @@ export function createMockCuratorTweet(
     userId: "curator_id",
     inReplyToStatusId: originalTweetId,
     timeParsed: new Date(),
-    hashtags: feedIds.map((id) => ({ tag: id })),
+    hashtags: feedIds,
     mentions: [{ username: "test_bot", id: "test_bot_id" }],
     photos: [],
     urls: [],
@@ -80,13 +79,19 @@ export function createMockModeratorTweet(
   };
 }
 
+// Counter to ensure unique IDs even when tests run in quick succession
+let submissionCounter = 0;
+
 /**
  * Creates a mock submission for testing
  * @param overrides Properties to override in the default submission
  * @returns A mock submission object
  */
 export function createMockSubmission(overrides = {}) {
-  const tweetId = Date.now().toString();
+  // Ensure unique tweet IDs by combining timestamp with a counter
+  submissionCounter++;
+  const tweetId = `${Date.now()}_${submissionCounter}_${Math.floor(Math.random() * 10000)}`;
+
   return {
     tweetId,
     userId: "testuser_id",
@@ -95,12 +100,12 @@ export function createMockSubmission(overrides = {}) {
     curatorId: "curator_id",
     curatorUsername: "curator",
     curatorTweetId: `curator_${tweetId}`,
-    feedId: "test-feed",
-    status: SubmissionStatus.PENDING,
-    submittedAt: new Date().toISOString(),
+    // These fields need to be Date objects for PostgreSQL
+    submittedAt: new Date(),
     curatorNotes: "",
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(),
     moderationHistory: [],
+    // Remove feedId and status as they're not part of TwitterSubmission
     ...overrides,
   };
 }

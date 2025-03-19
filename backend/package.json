@@ -11,8 +11,10 @@
     "test:component": "bun test test/component",
     "test:integration": "bun test test/integration",
     "test:e2e": "bun test test/e2e",
-    "test:setup": "bun test/setup/global-setup.ts",
-    "test:teardown": "bun test/setup/global-teardown.ts",
+    "test:pg": "npm run docker:test:reset && sleep 5 && bun test",
+    "test:pg:integration": "npm run docker:test:reset && sleep 5 && bun test test/integration",
+    "test:pg:component": "npm run docker:test:reset && sleep 5 && bun test test/component",
+    "test:pg:e2e": "npm run docker:test:reset && sleep 5 && bun test test/e2e",
     "clean": "rm -rf dist coverage .turbo",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -24,7 +26,10 @@
     "db:migrate-sqlite-to-pg": "bun run ./scripts/migrate-sqlite-to-postgres.js",
     "docker:up": "cd .. && docker-compose up -d",
     "docker:down": "cd .. && docker-compose down",
-    "docker:reset": "cd .. && docker-compose down -v && docker-compose up -d"
+    "docker:reset": "cd .. && docker-compose down -v && docker-compose up -d",
+    "docker:test:up": "docker-compose -f ./test/setup/docker-compose.yml up -d",
+    "docker:test:down": "docker-compose -f ./test/setup/docker-compose.yml down -v",
+    "docker:test:reset": "npm run docker:test:down && npm run docker:test:up"
   },
   "browserslist": {
     "production": [

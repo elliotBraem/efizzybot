@@ -1,23 +1,22 @@
 import {
-  describe,
-  test,
-  expect,
-  beforeAll,
   afterAll,
-  beforeEach,
   afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
 } from "bun:test";
 import nock from "nock";
-import { createTestClient } from "../utils/test-client";
 import {
-  createMockTweet,
   createMockCuratorTweet,
   createMockModeratorTweet,
+  createMockTweet,
 } from "../utils/test-data";
 import {
-  setupTestServer,
   cleanupTestServer,
   setupDefaultTwitterMocks,
+  setupTestServer,
 } from "../utils/test-helpers";
 
 describe("Approval Flow", () => {
@@ -59,10 +58,62 @@ describe("Approval Flow", () => {
       .get(`/tweets/${tweet.id}`)
       .reply(200, tweet);
 
-    // Submit the tweet
-    await apiClient.post("/api/twitter/mention", {
-      tweet: curatorTweet,
-    });
+    // Mock the fetchSearchTweets response for the submission tweet
+    nock("https://api.twitter.com")
+      .get(/\/graphql\/.*\/SearchTimeline\?.*/)
+      .reply(200, {
+        data: {
+          search_by_raw_query: {
+            search_timeline: {
+              timeline: {
+                instructions: [
+                  {
+                    type: "TimelineAddEntries",
+                    entries: [
+                      {
+                        entryId: "tweet-1",
+                        content: {
+                          entryType: "TimelineTimelineItem",
+                          itemContent: {
+                            itemType: "TimelineTweet",
+                            tweet_results: {
+                              result: {
+                                rest_id: curatorTweet.id,
+                                legacy: {
+                                  created_at: new Date().toISOString(),
+                                  full_text: curatorTweet.text,
+                                  in_reply_to_status_id_str: tweet.id,
+                                  entities: {
+                                    hashtags: curatorTweet.hashtags.map(tag => ({ text: tag })),
+                                    user_mentions: curatorTweet.mentions.map(mention => ({ screen_name: mention.username }))
+                                  }
+                                },
+                                core: {
+                                  user_results: {
+                                    result: {
+                                      legacy: {
+                                        screen_name: curatorTweet.username,
+                                      },
+                                      rest_id: curatorTweet.userId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      });
+
+    // Trigger the checkMentions method to process the submission
+    await server.context.submissionService["checkMentions"]();
 
     // Mock the moderator list
     nock("http://localhost")
@@ -84,13 +135,96 @@ describe("Approval Flow", () => {
     // Create a moderator tweet for approval
     const moderatorTweet = createMockModeratorTweet(curatorTweet.id, "approve");
 
-    // Act
-    const response = await apiClient.post("/api/twitter/mention", {
-      tweet: moderatorTweet,
-    });
+    // Mock the fetchSearchTweets response for the moderation tweet
+    // This time we need to return both tweets in chronological order
+    nock("https://api.twitter.com")
+      .get(/\/graphql\/.*\/SearchTimeline\?.*/)
+      .reply(200, {
+        data: {
+          search_by_raw_query: {
+            search_timeline: {
+              timeline: {
+                instructions: [
+                  {
+                    type: "TimelineAddEntries",
+                    entries: [
+                      {
+                        entryId: "tweet-1",
+                        content: {
+                          entryType: "TimelineTimelineItem",
+                          itemContent: {
+                            itemType: "TimelineTweet",
+                            tweet_results: {
+                              result: {
+                                rest_id: curatorTweet.id,
+                                legacy: {
+                                  created_at: new Date(Date.now() - 60000).toISOString(), // 1 minute ago
+                                  full_text: curatorTweet.text,
+                                  in_reply_to_status_id_str: tweet.id,
+                                  entities: {
+                                    hashtags: curatorTweet.hashtags.map(tag => ({ text: tag })),
+                                    user_mentions: curatorTweet.mentions.map(mention => ({ screen_name: mention.username }))
+                                  }
+                                },
+                                core: {
+                                  user_results: {
+                                    result: {
+                                      legacy: {
+                                        screen_name: curatorTweet.username,
+                                      },
+                                      rest_id: curatorTweet.userId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        entryId: "tweet-2",
+                        content: {
+                          entryType: "TimelineTimelineItem",
+                          itemContent: {
+                            itemType: "TimelineTweet",
+                            tweet_results: {
+                              result: {
+                                rest_id: moderatorTweet.id,
+                                legacy: {
+                                  created_at: new Date().toISOString(), // now
+                                  full_text: moderatorTweet.text,
+                                  in_reply_to_status_id_str: curatorTweet.id,
+                                  entities: {
+                                    hashtags: moderatorTweet.hashtags.map(tag => ({ text: tag })),
+                                    user_mentions: moderatorTweet.mentions.map(mention => ({ screen_name: mention.username }))
+                                  }
+                                },
+                                core: {
+                                  user_results: {
+                                    result: {
+                                      legacy: {
+                                        screen_name: moderatorTweet.username,
+                                      },
+                                      rest_id: moderatorTweet.userId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      });
 
-    // Assert
-    expect(response.status).toBe(200);
+    // Trigger the checkMentions method again to process the moderation
+    await server.context.submissionService["checkMentions"]();
 
     // Verify the submission was approved
     const submissionResponse = await apiClient.get(
@@ -113,10 +247,62 @@ describe("Approval Flow", () => {
       .get(`/tweets/${tweet.id}`)
       .reply(200, tweet);
 
-    // Submit the tweet
-    await apiClient.post("/api/twitter/mention", {
-      tweet: curatorTweet,
-    });
+    // Mock the fetchSearchTweets response for the submission tweet
+    nock("https://api.twitter.com")
+      .get(/\/graphql\/.*\/SearchTimeline\?.*/)
+      .reply(200, {
+        data: {
+          search_by_raw_query: {
+            search_timeline: {
+              timeline: {
+                instructions: [
+                  {
+                    type: "TimelineAddEntries",
+                    entries: [
+                      {
+                        entryId: "tweet-1",
+                        content: {
+                          entryType: "TimelineTimelineItem",
+                          itemContent: {
+                            itemType: "TimelineTweet",
+                            tweet_results: {
+                              result: {
+                                rest_id: curatorTweet.id,
+                                legacy: {
+                                  created_at: new Date().toISOString(),
+                                  full_text: curatorTweet.text,
+                                  in_reply_to_status_id_str: tweet.id,
+                                  entities: {
+                                    hashtags: curatorTweet.hashtags.map(tag => ({ text: tag })),
+                                    user_mentions: curatorTweet.mentions.map(mention => ({ screen_name: mention.username }))
+                                  }
+                                },
+                                core: {
+                                  user_results: {
+                                    result: {
+                                      legacy: {
+                                        screen_name: curatorTweet.username,
+                                      },
+                                      rest_id: curatorTweet.userId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      });
+
+    // Trigger the checkMentions method to process the submission
+    await server.context.submissionService["checkMentions"]();
 
     // Mock the moderator list
     nock("http://localhost")
@@ -133,13 +319,95 @@ describe("Approval Flow", () => {
     // Create a moderator tweet for rejection
     const moderatorTweet = createMockModeratorTweet(curatorTweet.id, "reject");
 
-    // Act
-    const response = await apiClient.post("/api/twitter/mention", {
-      tweet: moderatorTweet,
-    });
+    // Mock the fetchSearchTweets response for the moderation tweet
+    nock("https://api.twitter.com")
+      .get(/\/graphql\/.*\/SearchTimeline\?.*/)
+      .reply(200, {
+        data: {
+          search_by_raw_query: {
+            search_timeline: {
+              timeline: {
+                instructions: [
+                  {
+                    type: "TimelineAddEntries",
+                    entries: [
+                      {
+                        entryId: "tweet-1",
+                        content: {
+                          entryType: "TimelineTimelineItem",
+                          itemContent: {
+                            itemType: "TimelineTweet",
+                            tweet_results: {
+                              result: {
+                                rest_id: curatorTweet.id,
+                                legacy: {
+                                  created_at: new Date(Date.now() - 60000).toISOString(), // 1 minute ago
+                                  full_text: curatorTweet.text,
+                                  in_reply_to_status_id_str: tweet.id,
+                                  entities: {
+                                    hashtags: curatorTweet.hashtags.map(tag => ({ text: tag })),
+                                    user_mentions: curatorTweet.mentions.map(mention => ({ screen_name: mention.username }))
+                                  }
+                                },
+                                core: {
+                                  user_results: {
+                                    result: {
+                                      legacy: {
+                                        screen_name: curatorTweet.username,
+                                      },
+                                      rest_id: curatorTweet.userId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        entryId: "tweet-2",
+                        content: {
+                          entryType: "TimelineTimelineItem",
+                          itemContent: {
+                            itemType: "TimelineTweet",
+                            tweet_results: {
+                              result: {
+                                rest_id: moderatorTweet.id,
+                                legacy: {
+                                  created_at: new Date().toISOString(), // now
+                                  full_text: moderatorTweet.text,
+                                  in_reply_to_status_id_str: curatorTweet.id,
+                                  entities: {
+                                    hashtags: moderatorTweet.hashtags.map(tag => ({ text: tag })),
+                                    user_mentions: moderatorTweet.mentions.map(mention => ({ screen_name: mention.username }))
+                                  }
+                                },
+                                core: {
+                                  user_results: {
+                                    result: {
+                                      legacy: {
+                                        screen_name: moderatorTweet.username,
+                                      },
+                                      rest_id: moderatorTweet.userId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      });
 
-    // Assert
-    expect(response.status).toBe(200);
+    // Trigger the checkMentions method again to process the moderation
+    await server.context.submissionService["checkMentions"]();
 
     // Verify the submission was rejected
     const submissionResponse = await apiClient.get(
@@ -162,10 +430,62 @@ describe("Approval Flow", () => {
       .get(`/tweets/${tweet.id}`)
       .reply(200, tweet);
 
-    // Submit the tweet
-    await apiClient.post("/api/twitter/mention", {
-      tweet: curatorTweet,
-    });
+    // Mock the fetchSearchTweets response for the submission tweet
+    nock("https://api.twitter.com")
+      .get(/\/graphql\/.*\/SearchTimeline\?.*/)
+      .reply(200, {
+        data: {
+          search_by_raw_query: {
+            search_timeline: {
+              timeline: {
+                instructions: [
+                  {
+                    type: "TimelineAddEntries",
+                    entries: [
+                      {
+                        entryId: "tweet-1",
+                        content: {
+                          entryType: "TimelineTimelineItem",
+                          itemContent: {
+                            itemType: "TimelineTweet",
+                            tweet_results: {
+                              result: {
+                                rest_id: curatorTweet.id,
+                                legacy: {
+                                  created_at: new Date().toISOString(),
+                                  full_text: curatorTweet.text,
+                                  in_reply_to_status_id_str: tweet.id,
+                                  entities: {
+                                    hashtags: curatorTweet.hashtags.map(tag => ({ text: tag })),
+                                    user_mentions: curatorTweet.mentions.map(mention => ({ screen_name: mention.username }))
+                                  }
+                                },
+                                core: {
+                                  user_results: {
+                                    result: {
+                                      legacy: {
+                                        screen_name: curatorTweet.username,
+                                      },
+                                      rest_id: curatorTweet.userId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      });
+
+    // Trigger the checkMentions method to process the submission
+    await server.context.submissionService["checkMentions"]();
 
     // Mock the moderator list to return empty (non-moderator)
     nock("http://localhost")
@@ -181,13 +501,95 @@ describe("Approval Flow", () => {
       userId: "non_moderator_id",
     };
 
-    // Act
-    const response = await apiClient.post("/api/twitter/mention", {
-      tweet: nonModeratorTweet,
-    });
+    // Mock the fetchSearchTweets response for the non-moderator tweet
+    nock("https://api.twitter.com")
+      .get(/\/graphql\/.*\/SearchTimeline\?.*/)
+      .reply(200, {
+        data: {
+          search_by_raw_query: {
+            search_timeline: {
+              timeline: {
+                instructions: [
+                  {
+                    type: "TimelineAddEntries",
+                    entries: [
+                      {
+                        entryId: "tweet-1",
+                        content: {
+                          entryType: "TimelineTimelineItem",
+                          itemContent: {
+                            itemType: "TimelineTweet",
+                            tweet_results: {
+                              result: {
+                                rest_id: curatorTweet.id,
+                                legacy: {
+                                  created_at: new Date(Date.now() - 60000).toISOString(), // 1 minute ago
+                                  full_text: curatorTweet.text,
+                                  in_reply_to_status_id_str: tweet.id,
+                                  entities: {
+                                    hashtags: curatorTweet.hashtags.map(tag => ({ text: tag })),
+                                    user_mentions: curatorTweet.mentions.map(mention => ({ screen_name: mention.username }))
+                                  }
+                                },
+                                core: {
+                                  user_results: {
+                                    result: {
+                                      legacy: {
+                                        screen_name: curatorTweet.username,
+                                      },
+                                      rest_id: curatorTweet.userId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        entryId: "tweet-2",
+                        content: {
+                          entryType: "TimelineTimelineItem",
+                          itemContent: {
+                            itemType: "TimelineTweet",
+                            tweet_results: {
+                              result: {
+                                rest_id: nonModeratorTweet.id,
+                                legacy: {
+                                  created_at: new Date().toISOString(), // now
+                                  full_text: nonModeratorTweet.text,
+                                  in_reply_to_status_id_str: curatorTweet.id,
+                                  entities: {
+                                    hashtags: nonModeratorTweet.hashtags.map(tag => ({ text: tag })),
+                                    user_mentions: nonModeratorTweet.mentions.map(mention => ({ screen_name: mention.username }))
+                                  }
+                                },
+                                core: {
+                                  user_results: {
+                                    result: {
+                                      legacy: {
+                                        screen_name: nonModeratorTweet.username,
+                                      },
+                                      rest_id: nonModeratorTweet.userId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      });
 
-    // Assert
-    expect(response.status).toBe(200);
+    // Trigger the checkMentions method again to process the non-moderator tweet
+    await server.context.submissionService["checkMentions"]();
 
     // Verify the submission was not approved (still pending)
     const submissionResponse = await apiClient.get(

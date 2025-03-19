@@ -1,23 +1,24 @@
-import fs from "fs";
-import path from "path";
+import { execSync } from "child_process";
+import { join } from "path";
 
 export default async () => {
   console.time("global-teardown");
   
-  // Only clean up in CI environment to keep the database for local debugging
-  if (process.env.CI) {
-    const testDbDir = path.join(process.cwd(), ".db-test");
-    const testDbPath = path.join(testDbDir, "test.sqlite");
+  // Stop and remove the PostgreSQL container
+  try {
+    const dockerComposePath = join(__dirname, "docker-compose.yml");
     
-    // Remove test database file if it exists
-    if (fs.existsSync(testDbPath)) {
-      try {
-        fs.unlinkSync(testDbPath);
-        console.log("Test database file removed");
-      } catch (error) {
-        console.error("Error removing test database file:", error);
-      }
+    // Only stop the container in CI environment to keep it running for local debugging
+    if (process.env.CI) {
+      console.log("Stopping PostgreSQL container...");
+      execSync(`docker-compose -f ${dockerComposePath} down -v`, { stdio: 'inherit' });
+      console.log("PostgreSQL container stopped and removed");
+    } else {
+      console.log("Skipping PostgreSQL container cleanup in local environment");
+      console.log("To stop the container manually, run: docker-compose -f backend/test/setup/docker-compose.yml down -v");
     }
+  } catch (error) {
+    console.error("Error during teardown:", error);
   }
   
   console.timeEnd("global-teardown");

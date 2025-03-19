@@ -1,19 +1,19 @@
 import {
-  describe,
-  test,
-  expect,
-  beforeAll,
   afterAll,
-  beforeEach,
   afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
 } from "bun:test";
 import nock from "nock";
-import { createTestClient } from "../utils/test-client";
-import { createMockTweet, createMockCuratorTweet } from "../utils/test-data";
+import { createMockCuratorTweet, createMockTweet } from "../utils/test-data";
 import {
-  setupTestServer,
   cleanupTestServer,
+  mockTwitterSearchTimeline,
   setupDefaultTwitterMocks,
+  setupTestServer,
 } from "../utils/test-helpers";
 
 describe("Submission Flow", () => {
@@ -55,13 +55,11 @@ describe("Submission Flow", () => {
       .get(`/tweets/${tweet.id}`)
       .reply(200, tweet);
 
-    // Act
-    const response = await apiClient.post("/api/twitter/mention", {
-      tweet: curatorTweet,
-    });
+    // Mock the fetchSearchTweets response to include our curator tweet
+    mockTwitterSearchTimeline([curatorTweet]);
 
-    // Assert
-    expect(response.status).toBe(200);
+    // Manually trigger the checkMentions method
+    await server.context.submissionService["checkMentions"]();
 
     // Verify the submission was saved
     const submissionResponse = await apiClient.get(
@@ -86,13 +84,11 @@ describe("Submission Flow", () => {
       .get(`/tweets/${tweet.id}`)
       .reply(200, tweet);
 
-    // Act
-    const response = await apiClient.post("/api/twitter/mention", {
-      tweet: curatorTweet,
-    });
+    // Mock the fetchSearchTweets response to include our curator tweet
+    mockTwitterSearchTimeline([curatorTweet]);
 
-    // Assert
-    expect(response.status).toBe(200);
+    // Manually trigger the checkMentions method
+    await server.context.submissionService["checkMentions"]();
 
     // Verify submissions were created for each feed
     for (const feedId of feedIds) {
@@ -132,13 +128,11 @@ describe("Submission Flow", () => {
       .get(`/tweets/${tweet.id}`)
       .reply(200, tweet);
 
-    // Act
-    const response = await apiClient.post("/api/twitter/mention", {
-      tweet: curatorTweet,
-    });
+    // Mock the fetchSearchTweets response to include our curator tweet
+    mockTwitterSearchTimeline([curatorTweet]);
 
-    // Assert
-    expect(response.status).toBe(200);
+    // Manually trigger the checkMentions method
+    await server.context.submissionService["checkMentions"]();
 
     // Verify the submission was auto-approved
     const submissionResponse = await apiClient.get(

@@ -1,174 +1,128 @@
-# Testing Infrastructure
+# Testing Strategy
 
-This directory contains the testing infrastructure for the curate.fun backend. The tests are organized according to Node.js testing best practices, focusing on component tests as the primary testing strategy.
+This directory contains tests for the curate.fun backend. The tests are organized into different categories based on their scope and purpose.
 
-## Directory Structure
+## Test Categories
 
-```
-backend/test/
-├── setup/                      # Test setup files
-│   ├── global-setup.ts         # Global setup for all tests
-│   ├── global-teardown.ts      # Global teardown for all tests
-│   └── docker-compose.yml      # Docker compose for test infrastructure
-├── utils/                      # Test utilities
-│   ├── test-client.ts          # HTTP client for API testing
-│   ├── test-data.ts            # Test data factories
-│   └── test-helpers.ts         # Helper functions for tests
-├── component/                  # Component tests (primary focus)
-│   ├── submission-flow.test.ts # Tests for submission flow
-│   └── approval-flow.test.ts   # Tests for approval flow
-├── unit/                       # Unit tests (secondary focus)
-│   └── sanitize.test.ts        # Tests for sanitization utilities
-├── integration/                # Integration tests
-│   └── database.test.ts        # Database integration tests
-└── e2e/                        # End-to-end tests
-    └── full-flow.test.ts       # Full flow from submission to distribution
-```
+- **Unit Tests**: Test individual functions and classes in isolation
+- **Component Tests**: Test multiple components working together
+- **Integration Tests**: Test integration with external systems like the database
+- **E2E Tests**: Test the entire application from end to end
 
-## Testing Approach
+## PostgreSQL Testing
 
-Our testing strategy follows these principles:
-
-1. **Component Testing Strategy**:
-   - Focus on component tests as the primary testing strategy
-   - Run a very few E2E tests
-   - Cover features, not functions
-   - Write tests during coding, never after
-   - Test the five known backend exit doors (outcomes)
-
-2. **Infrastructure and Database Setup**:
-   - Use Docker-Compose to host the database and other infrastructure
-   - Start docker-compose using code in the global setup process
-   - Shutoff the infrastructure only in the CI environment
-   - Optimize your real DB for testing, don't fake it
-   - Store test data in RAM folder
-   - Build the DB schema using migrations
-
-3. **Web Server Setup**:
-   - The test and the backend should live within the same process
-   - Let the tests control when the server should start and shutoff
-   - Specify a port in production, randomize in testing
-
-4. **Test Anatomy**:
-   - Stick to unit testing best practices, aim for great developer-experience
-   - Approach the API using a library that is a pure HTTP client
-   - Provide real credentials or token
-   - Assert on the entire HTTP response object, not on every field
-   - Structure tests by routes and stories
-   - Test the five potential outcomes
-
-5. **Integration Testing**:
-   - Isolate the component from the world using HTTP interceptor
-   - Define default responses before every test to ensure a clean slate
-   - Override the happy defaults with corner cases using unique paths
-   - Deny all outgoing requests by default
-   - Simulate network chaos
-   - Catch invalid outgoing requests by specifying the request schema
-   - Record real outgoing requests for awareness
-   - Code against a strict API provider contract
-   - Fake the time to minimize network call duration
-
-6. **Data Management**:
-   - Each test should act on its own records only
-   - Only metadata and context data should get pre-seeded to the database
-   - Assert the new data state using the public API
-   - Choose a clear data clean-up strategy: After-all (recommended) or after-each
-   - Add some randomness to unique fields
-   - Test also the response schema
-   - Install the DB schema using the same technique like production
-   - Test for undesired side effects
-
-## Running Tests
-
-### Prerequisites
-
-- Docker and Docker Compose installed
-- Bun installed
-- PostgreSQL client installed (optional, for debugging)
+The project has migrated from SQLite to PostgreSQL for testing. This provides a more realistic testing environment that matches production.
 
 ### Setup
 
-1. Install dependencies:
-   ```
-   bun install
-   ```
+The PostgreSQL testing environment is set up using Docker Compose. The `docker-compose.yml` file in the `setup` directory defines a PostgreSQL container that is used for testing.
 
-2. Start the test infrastructure:
-   ```
-   bun test:setup
-   ```
+To start the PostgreSQL container:
 
-### Running Tests
+```bash
+npm run docker:test:up
+```
 
-- Run all tests:
-  ```
-  bun test
-  ```
+To stop the PostgreSQL container:
 
-- Run specific test types:
-  ```
-  bun test:unit        # Run unit tests
-  bun test:component   # Run component tests
-  bun test:integration # Run integration tests
-  bun test:e2e         # Run end-to-end tests
-  ```
+```bash
+npm run docker:test:down
+```
 
-- Run tests in watch mode:
-  ```
-  bun test:watch
-  ```
+### Running Tests with PostgreSQL
 
-### Teardown
+To run tests with PostgreSQL:
 
-- Tear down the test infrastructure (only needed in CI, as local development keeps it running):
-  ```
-  bun test:teardown
-  ```
+```bash
+# Run all tests with PostgreSQL
+npm run test:pg
+
+# Run only integration tests with PostgreSQL
+npm run test:pg:integration
+
+# Run only component tests with PostgreSQL
+npm run test:pg:component
+
+# Run only E2E tests with PostgreSQL
+npm run test:pg:e2e
+```
+
+These commands will:
+1. Start the PostgreSQL container
+2. Run the migrations to set up the schema
+3. Run the tests
+4. Clean up the database after tests
+
+### Test Environment
+
+The test environment is configured in `.env.test`. This file sets the database connection string and other environment variables for testing.
+
+### Test Data
+
+The test database is seeded with a consistent set of test data defined in `setup/seed/seed.sql`. This includes:
+
+- Test feeds
+- Test submissions
+- Test submission feeds
+- Test moderation history
+- Test feed plugins
+- Test submission counts
+
+This seed data provides a consistent starting point for all tests, making them more reliable and predictable.
+
+### Global Setup and Teardown
+
+The `setup/global-setup.ts` and `setup/global-teardown.ts` files handle the setup and teardown of the test environment. They:
+
+1. Start the PostgreSQL container
+2. Wait for PostgreSQL to be ready
+3. Set environment variables for the test database
+4. Run migrations to set up the schema
+5. Seed the database with test data
+6. Clean up after tests
 
 ## Writing Tests
 
-### Component Tests
+When writing tests that interact with the database:
 
-Component tests should focus on testing the system as a whole, with real infrastructure but mocked external services. They should test the main flows of the application, such as submission, approval, and distribution.
+1. Use the `db` service from `src/services/db`
+2. Make sure to clean up data after tests
+3. Use transactions when possible to isolate tests
+4. Use the `createMockSubmission` helper to create test data
 
 Example:
+
 ```typescript
-test('When a tweet is submitted to a feed, it should be saved and pending approval', async () => {
-  // Arrange
-  const tweet = createMockTweet();
-  const curatorTweet = createMockCuratorTweet(tweet.id);
-  
-  // Mock Twitter API
-  nock('https://api.twitter.com')
-    .get(`/tweets/${tweet.id}`)
-    .reply(200, tweet);
-  
-  // Act
-  const response = await apiClient.post('/api/twitter/mention', {
-    tweet: curatorTweet,
+import { db } from "../../src/services/db";
+import { createMockSubmission } from "../utils/test-data";
+
+describe("Database Integration", () => {
+  beforeEach(async () => {
+    // Clean up tables before each test
+    await pgPool.query("DELETE FROM submission_feeds");
+    await pgPool.query("DELETE FROM submissions");
   });
-  
-  // Assert
-  expect(response.status).toBe(200);
-  
-  // Verify the submission was saved
-  const submissionResponse = await apiClient.get(`/api/submission/${tweet.id}`);
-  expect(submissionResponse.status).toBe(200);
-  expect(submissionResponse.data).toMatchObject({
-    tweetId: tweet.id,
-    status: 'pending',
+
+  test("Should save and retrieve a submission", async () => {
+    // Arrange
+    const submission = createMockSubmission();
+
+    // Act
+    await db.saveSubmission(submission);
+
+    // Assert
+    const retrievedSubmission = await db.getSubmission(submission.tweetId);
+    expect(retrievedSubmission).toMatchObject({
+      tweetId: submission.tweetId,
+      userId: submission.userId,
+      username: submission.username,
+    });
   });
 });
 ```
 
-### Unit Tests
+## Mocking vs. Real Database
 
-Unit tests should focus on testing individual functions and utilities in isolation. They should be fast and not require any external services.
+For unit tests, you can use the database mocks in `src/__tests__/mocks/db-service.mock.ts`.
 
-### Integration Tests
-
-Integration tests should focus on testing the integration with external services, such as the database or Twitter API. They should use real infrastructure but may mock some external services.
-
-### E2E Tests
-
-E2E tests should focus on testing the full flow of the application, from submission to distribution. They should use real infrastructure and minimal mocking.
+For component, integration, and E2E tests, use the real PostgreSQL database to ensure realistic behavior.

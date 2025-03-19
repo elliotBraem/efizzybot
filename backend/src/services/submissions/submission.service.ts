@@ -12,7 +12,7 @@ import { TwitterService } from "../twitter/client";
 import { ProcessorService } from "../processor/processor.service";
 
 export class SubmissionService {
-  private checkInterval: NodeJS.Timeout | null = null;
+  private checkInterval: NodeJS.Timer | null = null;
   private adminIdCache: Map<string, string> = new Map();
 
   constructor(
