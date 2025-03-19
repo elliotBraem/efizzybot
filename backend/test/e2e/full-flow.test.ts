@@ -14,7 +14,7 @@ import {
 } from "../utils/test-data";
 import {
   cleanupTestServer,
-  setupDefaultTwitterMocks,
+  mockTwitterSearchTimeline,
   setupTestServer,
 } from "../utils/test-helpers";
 
@@ -40,7 +40,6 @@ describe("Full Flow E2E", () => {
     // Disable external network requests but allow localhost
     nock.disableNetConnect();
     nock.enableNetConnect(/(127\.0\.0\.1|localhost)/);
-    setupDefaultTwitterMocks();
   });
 
   test("Full flow from submission to distribution", async () => {
@@ -48,10 +47,7 @@ describe("Full Flow E2E", () => {
     const tweet = createMockTweet();
     const curatorTweet = createMockCuratorTweet(tweet.id);
 
-    // Mock Twitter API for the original tweet
-    nock("https://api.twitter.com")
-      .get(`/tweets/${tweet.id}`)
-      .reply(200, tweet);
+    mockTwitterSearchTimeline([tweet, curatorTweet])
 
     // Mock the moderator list
     nock("http://localhost")
