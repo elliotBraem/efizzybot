@@ -332,9 +332,7 @@ export class DatabaseService {
     }, true); // Write operation
   }
 
-  async getSubmissionsByFeed(
-    feedId: string,
-  ): Promise<
+  async getSubmissionsByFeed(feedId: string): Promise<
     (TwitterSubmission & {
       status: SubmissionStatus;
       moderationResponseTweetId?: string;
