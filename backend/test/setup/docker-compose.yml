@@ -1,0 +1,12 @@
+version: '3.6'
+services:
+  # No database service needed as we're using SQLite
+  # We can add other services here if needed in the future
+  # For example, Redis when it's implemented
+  
+  # Example for future Redis implementation:
+  # redis:
+  #   image: redis:alpine
+  #   ports:
+  #     - '63790:6379'
+  #   command: redis-server --appendonly yes
