@@ -1,10 +1,9 @@
 # Base stage with common dependencies
 FROM oven/bun:1.0.27-alpine as base
 
-# Enable Corepack for package manager versioning
+# Set Bun environment variables
 ENV BUN_HOME="/bun"
 ENV PATH="$BUN_HOME:$PATH"
-RUN corepack enable
 
 # Builder stage for pruning the monorepo
 FROM base AS pruner
