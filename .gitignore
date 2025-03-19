@@ -47,3 +47,6 @@ next-env.d.ts
 .turbo
 package-lock.json
 bun.lockb
+
+# JetBrains
+.idea/
