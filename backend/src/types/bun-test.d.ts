@@ -1,4 +1,4 @@
-declare module 'bun:test' {
+declare module "bun:test" {
   export function describe(name: string, fn: () => void): void;
   export function test(name: string, fn: () => void | Promise<void>): void;
   export function beforeAll(fn: () => void | Promise<void>): void;
@@ -29,7 +29,7 @@ declare module 'bun:test' {
     not: any;
   };
   export function mock<T extends (...args: any[]) => any>(
-    implementation?: T
+    implementation?: T,
   ): jest.Mock<ReturnType<T>, Parameters<T>>;
 
   namespace jest {

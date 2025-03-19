@@ -1,9 +1,9 @@
 // Load environment variables from the appropriate .env file
-import { config } from 'dotenv';
-import path from 'path';
+import { config } from "dotenv";
+import path from "path";
 
-if (process.env.NODE_ENV === 'test') {
-  config({ path: path.resolve(process.cwd(), 'backend/.env.test') });
+if (process.env.NODE_ENV === "test") {
+  config({ path: path.resolve(process.cwd(), "backend/.env.test") });
 } else {
   config();
 }
@@ -41,7 +41,7 @@ async function startServer() {
     startSpinner("server", "Starting server...");
 
     // Initialize database in production, but not in tests
-    if (process.env.NODE_ENV !== 'test') {
+    if (process.env.NODE_ENV !== "test") {
       startSpinner("database", "Initializing database...");
       const dbInitialized = await initializeDatabase();
       if (dbInitialized) {
@@ -99,7 +99,7 @@ async function startServer() {
           shutdownPromises.push(context.submissionService.stop());
         if (context.distributionService)
           shutdownPromises.push(context.distributionService.shutdown());
-        
+
         shutdownPromises.push(db.disconnect());
 
         await Promise.all(shutdownPromises);

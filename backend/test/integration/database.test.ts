@@ -17,40 +17,46 @@ describe("Database Integration", () => {
   beforeAll(async () => {
     try {
       // Set environment variables for test database
-      process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:54321/test";
-      process.env.DATABASE_WRITE_URL = "postgresql://postgres:postgres@localhost:54321/test";
-      process.env.DATABASE_READ_URL = "postgresql://postgres:postgres@localhost:54321/test";
-      
+      process.env.DATABASE_URL =
+        "postgresql://postgres:postgres@localhost:54321/test";
+      process.env.DATABASE_WRITE_URL =
+        "postgresql://postgres:postgres@localhost:54321/test";
+      process.env.DATABASE_READ_URL =
+        "postgresql://postgres:postgres@localhost:54321/test";
+
       // Create a direct connection to the test database for cleanup operations
-      pgPool = new Pool({ 
+      pgPool = new Pool({
         connectionString: process.env.DATABASE_URL,
         max: 5,
         idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 5000
+        connectionTimeoutMillis: 5000,
       });
-      
+
       // Initialize the database connection
-      console.log('Initializing database service connection...');
+      console.log("Initializing database service connection...");
       await db.connect();
-      console.log('Database service connected successfully');
-      
+      console.log("Database service connected successfully");
+
       // Verify database service connection
       const healthCheck = await db.healthCheck();
-      console.log('Database health check:', healthCheck);
-      
-      if (healthCheck.status !== 'ok') {
-        throw new Error('Database health check failed');
+      console.log("Database health check:", healthCheck);
+
+      if (healthCheck.status !== "ok") {
+        throw new Error("Database health check failed");
       }
-      
+
       // Verify tables exist
       const tables = await pgPool.query(`
         SELECT table_name 
         FROM information_schema.tables 
         WHERE table_schema = 'public'
       `);
-      console.log("Available tables:", tables.rows.map(row => row.table_name).join(', '));
+      console.log(
+        "Available tables:",
+        tables.rows.map((row) => row.table_name).join(", "),
+      );
     } catch (error) {
-      console.error('Error in beforeAll:', error);
+      console.error("Error in beforeAll:", error);
       throw error;
     }
   });
@@ -60,14 +66,14 @@ describe("Database Integration", () => {
       // Close the PostgreSQL connection
       if (pgPool) {
         await pgPool.end();
-        console.log('PostgreSQL pool closed');
+        console.log("PostgreSQL pool closed");
       }
-      
+
       // Close the database service connection
       await db.disconnect();
-      console.log('Database service disconnected');
+      console.log("Database service disconnected");
     } catch (error) {
-      console.error('Error in afterAll:', error);
+      console.error("Error in afterAll:", error);
     }
   });
 
@@ -77,9 +83,9 @@ describe("Database Integration", () => {
       await pgPool.query("DELETE FROM submission_feeds");
       await pgPool.query("DELETE FROM moderation_history");
       await pgPool.query("DELETE FROM submissions");
-      console.log('Tables cleaned up for test');
+      console.log("Tables cleaned up for test");
     } catch (error) {
-      console.error('Error in beforeEach:', error);
+      console.error("Error in beforeEach:", error);
       throw error;
     }
   });
@@ -196,7 +202,9 @@ describe("Database Integration", () => {
     const allSubmissions = await db.getAllSubmissions();
 
     // Act - Get pending submissions
-    const pendingSubmissions = await db.getAllSubmissions(SubmissionStatus.PENDING);
+    const pendingSubmissions = await db.getAllSubmissions(
+      SubmissionStatus.PENDING,
+    );
 
     // Assert
     expect(allSubmissions.length).toBeGreaterThanOrEqual(3);
@@ -205,7 +213,9 @@ describe("Database Integration", () => {
     // Check that pending submissions have the correct status
     for (const submission of pendingSubmissions) {
       expect(
-        submission.feedStatuses?.some((f) => f.status === SubmissionStatus.PENDING),
+        submission.feedStatuses?.some(
+          (f) => f.status === SubmissionStatus.PENDING,
+        ),
       ).toBe(true);
     }
   });

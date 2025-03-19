@@ -47,7 +47,7 @@ describe("Full Flow E2E", () => {
     const tweet = createMockTweet();
     const curatorTweet = createMockCuratorTweet(tweet.id);
 
-    mockTwitterSearchTimeline([tweet, curatorTweet])
+    mockTwitterSearchTimeline([tweet, curatorTweet]);
 
     // Mock the moderator list
     nock("http://localhost")
@@ -67,9 +67,12 @@ describe("Full Flow E2E", () => {
       .reply(200, { success: true });
 
     // Act - Submit tweet
-    const submissionResponse = await apiClient.post("/api/test/twitter/mention", {
-      tweet: curatorTweet,
-    });
+    const submissionResponse = await apiClient.post(
+      "/api/test/twitter/mention",
+      {
+        tweet: curatorTweet,
+      },
+    );
 
     // Assert submission
     expect(submissionResponse.status).toBe(200);

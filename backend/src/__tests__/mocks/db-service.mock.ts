@@ -1,11 +1,11 @@
 import { DatabaseService } from "../../services/db";
-import { 
-  Moderation, 
-  SubmissionFeed, 
-  SubmissionStatus, 
-  TwitterCookie, 
+import {
+  Moderation,
+  SubmissionFeed,
+  SubmissionStatus,
+  TwitterCookie,
   TwitterSubmission,
-  TwitterSubmissionWithFeedData
+  TwitterSubmissionWithFeedData,
 } from "../../types/twitter";
 
 // Create a mock function helper since we can't use jest directly
@@ -17,27 +17,29 @@ type MockFunction<T> = T & {
   };
 };
 
-function createMockFn<T extends (...args: any[]) => any>(implementation?: T): MockFunction<T> {
+function createMockFn<T extends (...args: any[]) => any>(
+  implementation?: T,
+): MockFunction<T> {
   const calls: any[][] = [];
   let returnValue: any = undefined;
-  
+
   const mockFn = ((...args: any[]) => {
     calls.push(args);
     return returnValue;
   }) as MockFunction<T>;
-  
+
   mockFn.mockReset = () => {
     calls.length = 0;
     returnValue = undefined;
   };
-  
+
   mockFn.mockReturnValue = (value: any) => {
     returnValue = value;
     return mockFn;
   };
-  
+
   mockFn.mock = { calls };
-  
+
   return mockFn;
 }
 
@@ -47,7 +49,7 @@ function createMockFn<T extends (...args: any[]) => any>(implementation?: T): Mo
 export class MockDatabaseService {
   private static instance: MockDatabaseService | null = null;
   private isConnected: boolean = true;
-  
+
   // Create mock functions for each database operation
   public getSubmissionByCuratorTweetId = createMockFn(() => null);
   public getSubmission = createMockFn(() => null);
@@ -74,8 +76,8 @@ export class MockDatabaseService {
   public setTwitterCookies = createMockFn(() => {});
   public deleteTwitterCookies = createMockFn(() => {});
   public removeFromSubmissionFeed = createMockFn(() => {});
-  public healthCheck = createMockFn(() => ({ status: 'ok' }));
-  
+  public healthCheck = createMockFn(() => ({ status: "ok" }));
+
   /**
    * Get the singleton instance of MockDatabaseService.
    */
@@ -85,29 +87,31 @@ export class MockDatabaseService {
     }
     return MockDatabaseService.instance;
   }
-  
+
   /**
    * Mock connect method that does nothing but set isConnected to true
    */
   public async connect(): Promise<void> {
     this.isConnected = true;
   }
-  
+
   /**
    * Mock disconnect method that does nothing but set isConnected to false
    */
   public async disconnect(): Promise<void> {
     this.isConnected = false;
   }
-  
+
   /**
    * Mock transaction method
    */
-  public async transaction<T>(operations: (client: any) => Promise<T>): Promise<T> {
+  public async transaction<T>(
+    operations: (client: any) => Promise<T>,
+  ): Promise<T> {
     // Just execute the operations without any transaction
     return operations({} as any);
   }
-  
+
   /**
    * Reset all mock functions
    */
@@ -138,11 +142,11 @@ export class MockDatabaseService {
       this.setTwitterCookies,
       this.deleteTwitterCookies,
       this.removeFromSubmissionFeed,
-      this.healthCheck
+      this.healthCheck,
     ];
-    
-    mockFunctions.forEach(mockFn => {
-      if (mockFn && typeof mockFn.mockReset === 'function') {
+
+    mockFunctions.forEach((mockFn) => {
+      if (mockFn && typeof mockFn.mockReset === "function") {
         mockFn.mockReset();
       }
     });

@@ -12,7 +12,7 @@ import { createMockCuratorTweet, createMockTweet } from "../utils/test-data";
 import {
   cleanupTestServer,
   mockTwitterSearchTimeline,
-  setupTestServer
+  setupTestServer,
 } from "../utils/test-helpers";
 
 describe("Submission Flow", () => {

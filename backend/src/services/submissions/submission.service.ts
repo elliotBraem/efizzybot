@@ -245,8 +245,7 @@ export class SubmissionService {
           // item data
           content: originalTweet.text || "",
           username: originalTweet.username!,
-          createdAt:
-            originalTweet.timeParsed || new Date(), // reply to post // vs as self post
+          createdAt: originalTweet.timeParsed || new Date(), // reply to post // vs as self post
 
           // curator data
           curatorId: userId, // tweetId, userId(curator)

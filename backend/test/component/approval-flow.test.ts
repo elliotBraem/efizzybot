@@ -69,7 +69,7 @@ describe("Approval Flow", () => {
     // Create a moderator tweet for approval
     const moderatorTweet = createMockModeratorTweet(curatorTweet.id, "approve");
 
-    mockTwitterSearchTimeline([curatorTweet, moderatorTweet])
+    mockTwitterSearchTimeline([curatorTweet, moderatorTweet]);
 
     // Trigger the checkMentions method again to process the moderation
     await server.context.submissionService["checkMentions"]();
@@ -90,7 +90,7 @@ describe("Approval Flow", () => {
     const tweet = createMockTweet();
     const curatorTweet = createMockCuratorTweet(tweet.id);
 
-    mockTwitterSearchTimeline([tweet, curatorTweet])
+    mockTwitterSearchTimeline([tweet, curatorTweet]);
 
     // Trigger the checkMentions method to process the submission
     await server.context.submissionService["checkMentions"]();

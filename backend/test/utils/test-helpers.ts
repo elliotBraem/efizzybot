@@ -51,13 +51,14 @@ export function mockTwitterSearchTimeline(tweets: Tweet[]) {
               full_text: tweet.text,
               in_reply_to_status_id_str: tweet.inReplyToStatusId,
               entities: {
-                hashtags: (tweet.hashtags || []).map(tag => {
+                hashtags: (tweet.hashtags || []).map((tag) => {
                   return { text: String(tag) };
                 }),
-                user_mentions: (tweet.mentions || []).map(mention => ({
-                  screen_name: typeof mention === 'string' ? mention : mention.username
-                }))
-              }
+                user_mentions: (tweet.mentions || []).map((mention) => ({
+                  screen_name:
+                    typeof mention === "string" ? mention : mention.username,
+                })),
+              },
             },
             core: {
               user_results: {
@@ -65,14 +66,14 @@ export function mockTwitterSearchTimeline(tweets: Tweet[]) {
                   legacy: {
                     screen_name: tweet.username,
                   },
-                  rest_id: tweet.userId
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+                  rest_id: tweet.userId,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   }));
 
   // Create the mock response
@@ -86,13 +87,13 @@ export function mockTwitterSearchTimeline(tweets: Tweet[]) {
               instructions: [
                 {
                   type: "TimelineAddEntries",
-                  entries
-                }
-              ]
-            }
-          }
-        }
-      }
+                  entries,
+                },
+              ],
+            },
+          },
+        },
+      },
     });
 }
 

@@ -17,7 +17,7 @@ describe("TwitterService", () => {
   beforeEach(async () => {
     // Reset all mocks
     resetMockDb();
-    
+
     // Create fresh instances
     twitterService = new TwitterService(mockConfig);
     mockScraper = new MockScraper();

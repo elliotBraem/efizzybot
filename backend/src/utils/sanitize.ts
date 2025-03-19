@@ -10,7 +10,7 @@ export function sanitizeJson(data: any): any {
     try {
       // Remove BOM if present
       let cleanString = data.replace(/^\uFEFF/, "");
-      
+
       // Try to parse if it's a string that might be JSON
       const trimmed = cleanString.trim();
       if (
@@ -21,12 +21,12 @@ export function sanitizeJson(data: any): any {
       ) {
         // Parse the string
         const parsed = JSON.parse(cleanString);
-        
+
         // If the result is still a string that looks like JSON, recursively parse it
         if (typeof parsed === "string") {
           return sanitizeJson(parsed);
         }
-        
+
         return parsed;
       }
       return data;

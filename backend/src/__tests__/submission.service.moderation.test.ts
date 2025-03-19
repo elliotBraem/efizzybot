@@ -87,7 +87,7 @@ describe("SubmissionService - Moderation", () => {
       mockProcessorService as any,
       mockConfig,
     );
-    
+
     // Replace the db reference in the SubmissionService with our mockDb
     (submissionService as any).db = mockDb;
 

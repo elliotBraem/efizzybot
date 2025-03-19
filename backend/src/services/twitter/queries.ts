@@ -3,12 +3,15 @@ import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { twitterCache, twitterCookies } from "./schema";
 
 // Twitter Cookie Management
-export async function getTwitterCookies(db: NodePgDatabase<any>, username: string) {
+export async function getTwitterCookies(
+  db: NodePgDatabase<any>,
+  username: string,
+) {
   return db
     .select()
     .from(twitterCookies)
     .where(eq(twitterCookies.username, username))
-    .then(rows => rows[0] || null);
+    .then((rows) => rows[0] || null);
 }
 
 export function setTwitterCookies(
@@ -43,12 +46,15 @@ export function deleteTwitterCookies(
 }
 
 // Twitter Cache Management
-export async function getTwitterCacheValue(db: NodePgDatabase<any>, key: string) {
+export async function getTwitterCacheValue(
+  db: NodePgDatabase<any>,
+  key: string,
+) {
   return db
     .select()
     .from(twitterCache)
     .where(eq(twitterCache.key, key))
-    .then(rows => rows[0] || null);
+    .then((rows) => rows[0] || null);
 }
 
 export function setTwitterCacheValue(
@@ -72,14 +78,8 @@ export function setTwitterCacheValue(
     .execute();
 }
 
-export function deleteTwitterCacheValue(
-  db: NodePgDatabase<any>,
-  key: string,
-) {
-  return db
-    .delete(twitterCache)
-    .where(eq(twitterCache.key, key))
-    .execute();
+export function deleteTwitterCacheValue(db: NodePgDatabase<any>, key: string) {
+  return db.delete(twitterCache).where(eq(twitterCache.key, key)).execute();
 }
 
 export function clearTwitterCache(db: NodePgDatabase<any>) {

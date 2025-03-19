@@ -24,7 +24,8 @@ export async function upsertFeeds(
 ): Promise<void> {
   await db.transaction(async (tx) => {
     for (const feed of feedsToUpsert) {
-      await tx.insert(feeds)
+      await tx
+        .insert(feeds)
         .values({
           id: feed.id,
           name: feed.name,
@@ -116,7 +117,9 @@ export async function saveSubmission(
       curatorUsername: submission.curatorUsername,
       curatorTweetId: submission.curatorTweetId,
       createdAt: new Date(submission.createdAt),
-      submittedAt: submission.submittedAt ? new Date(submission.submittedAt) : null,
+      submittedAt: submission.submittedAt
+        ? new Date(submission.submittedAt)
+        : null,
     } as any)
     .execute();
 }
@@ -265,7 +268,9 @@ export async function getSubmissionByCuratorTweetId(
     curatorUsername: results[0].s.curatorUsername,
     curatorTweetId: results[0].s.curatorTweetId,
     createdAt: new Date(results[0].s.createdAt),
-    submittedAt: results[0].s.submittedAt ? new Date(results[0].s.submittedAt) : null,
+    submittedAt: results[0].s.submittedAt
+      ? new Date(results[0].s.submittedAt)
+      : null,
     moderationHistory: modHistory,
   };
 }
@@ -338,7 +343,9 @@ export async function getSubmission(
     curatorUsername: results[0].s.curatorUsername,
     curatorTweetId: results[0].s.curatorTweetId,
     createdAt: new Date(results[0].s.createdAt),
-    submittedAt: results[0].s.submittedAt ? new Date(results[0].s.submittedAt) : null,
+    submittedAt: results[0].s.submittedAt
+      ? new Date(results[0].s.submittedAt)
+      : null,
     moderationHistory: modHistory,
   };
 }
@@ -462,7 +469,9 @@ export async function getAllSubmissions(
         curatorUsername: result.s.curatorUsername,
         curatorTweetId: result.s.curatorTweetId,
         createdAt: new Date(result.s.createdAt),
-        submittedAt: result.s.submittedAt ? new Date(result.s.submittedAt) : null,
+        submittedAt: result.s.submittedAt
+          ? new Date(result.s.submittedAt)
+          : null,
         moderationHistory: [],
         status: status
           ? (status as SubmissionStatus)
@@ -644,7 +653,7 @@ export async function getFeedPlugin(
     .where(
       and(eq(feedPlugins.feedId, feedId), eq(feedPlugins.pluginId, pluginId)),
     );
-  
+
   return results.length > 0 ? results[0] : null;
 }
 
@@ -699,7 +708,9 @@ export async function getPostsCount(db: NodePgDatabase<any>): Promise<number> {
   return result.rows.length > 0 ? Number(result.rows[0].count) : 0;
 }
 
-export async function getCuratorsCount(db: NodePgDatabase<any>): Promise<number> {
+export async function getCuratorsCount(
+  db: NodePgDatabase<any>,
+): Promise<number> {
   // Count unique curator IDs
   const result = await db.execute(sql`
     SELECT COUNT(DISTINCT curator_id) as count
@@ -710,7 +721,9 @@ export async function getCuratorsCount(db: NodePgDatabase<any>): Promise<number>
   return result.rows.length > 0 ? Number(result.rows[0].count) : 0;
 }
 
-export async function getLeaderboard(db: NodePgDatabase<any>): Promise<LeaderboardEntry[]> {
+export async function getLeaderboard(
+  db: NodePgDatabase<any>,
+): Promise<LeaderboardEntry[]> {
   // Step 1: Get all curators with their total submission counts
   const curatorsResult = await db.execute(sql`
     SELECT 
@@ -725,10 +738,10 @@ export async function getLeaderboard(db: NodePgDatabase<any>): Promise<Leaderboa
       submissioncount DESC
   `);
 
-  const curators = curatorsResult.rows.map(row => ({
+  const curators = curatorsResult.rows.map((row) => ({
     curatorId: String(row.curatorid),
     curatorUsername: String(row.curatorusername),
-    submissionCount: Number(row.submissioncount)
+    submissionCount: Number(row.submissioncount),
   }));
 
   // Step 2: Get total submissions per feed
@@ -767,11 +780,13 @@ export async function getLeaderboard(db: NodePgDatabase<any>): Promise<Leaderboa
     `);
 
     // Convert to FeedSubmissionCount array with total counts
-    const feedSubmissions: FeedSubmissionCount[] = curatorFeedsResult.rows.map(row => ({
-      feedId: String(row.feedid),
-      count: Number(row.count),
-      totalInFeed: feedTotalsMap.get(String(row.feedid)) || 0,
-    }));
+    const feedSubmissions: FeedSubmissionCount[] = curatorFeedsResult.rows.map(
+      (row) => ({
+        feedId: String(row.feedid),
+        count: Number(row.count),
+        totalInFeed: feedTotalsMap.get(String(row.feedid)) || 0,
+      }),
+    );
 
     // Sort by count (highest first)
     feedSubmissions.sort((a, b) => b.count - a.count);
@@ -790,10 +805,12 @@ export async function getLeaderboard(db: NodePgDatabase<any>): Promise<Leaderboa
 export async function getSubmissionsByFeed(
   db: NodePgDatabase<any>,
   feedId: string,
-): Promise<(TwitterSubmission & {
-  status: SubmissionStatus;
-  moderationResponseTweetId?: string;
-})[]> {
+): Promise<
+  (TwitterSubmission & {
+    status: SubmissionStatus;
+    moderationResponseTweetId?: string;
+  })[]
+> {
   const results = await db
     .select({
       s: {
@@ -848,7 +865,9 @@ export async function getSubmissionsByFeed(
         curatorUsername: result.s.curatorUsername,
         curatorTweetId: result.s.curatorTweetId,
         createdAt: new Date(result.s.createdAt),
-        submittedAt: result.s.submittedAt ? new Date(result.s.submittedAt) : null,
+        submittedAt: result.s.submittedAt
+          ? new Date(result.s.submittedAt)
+          : null,
         moderationHistory: [],
         status: result.sf.status,
         moderationResponseTweetId:
