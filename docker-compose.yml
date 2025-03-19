@@ -32,18 +32,18 @@ services:
 
   # Optional application service
   # Uncomment to run the application in Docker
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   environment:
-  #     DATABASE_URL: postgresql://postgres:postgres@postgres:5432/curatedotfun
-  #     NODE_ENV: production
-  #   ports:
-  #     - "3000:3000"
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/curatedotfun
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
 
   # Test service for running tests against PostgreSQL
   # test:

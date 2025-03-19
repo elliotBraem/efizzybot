@@ -45,7 +45,8 @@
   },
   "devDependencies": {
     "@curatedotfun/types": "^0.0.5",
-    "@module-federation/node": "^2.6.22",
+    "@module-federation/node": "^2.6.30",
+    "@module-federation/runtime": "^0.11.1",
     "@rspack/binding": "1.2.6",
     "@rspack/cli": "1.2.6",
     "@rspack/core": "1.2.6",

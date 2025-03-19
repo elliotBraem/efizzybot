@@ -3,14 +3,18 @@
   "globalDependencies": ["**/.env*"],
   "globalEnv": ["NODE_ENV", "DATABASE_URL"],
   "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "@curatedotfun/backend#build": {
+      "dependsOn": ["@curatedotfun/frontend#build", "^build"],
+      "outputs": ["dist/**"]
+    },
     "dev": {
       "cache": false,
       "persistent": true,
       "dependsOn": ["^build"]
-    },
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
     },
     "start": {
       "dependsOn": ["build"]
