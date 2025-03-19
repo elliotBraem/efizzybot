@@ -24,31 +24,6 @@ export async function cleanupTestServer(server: any) {
 }
 
 /**
- * Sets up default Twitter API mocks
- */
-export function setupDefaultTwitterMocks() {
-  // Disable external network requests
-  nock.disableNetConnect();
-  nock.enableNetConnect("127.0.0.1");
-
-  // Set up default Twitter API mocks
-  nock("https://api.twitter.com")
-    .get(/\/tweets\/.*/)
-    .reply(200, (uri) => {
-      const tweetId = uri.split("/").pop();
-      return {
-        id: tweetId,
-        text: `Mock tweet ${tweetId}`,
-        user: {
-          id: "mock_user_id",
-          username: "mock_user",
-        },
-      };
-    })
-    .persist();
-}
-
-/**
  * Mocks the Twitter SearchTimeline API to return the specified tweets
  * @param tweets Array of tweets to include in the response
  * @returns The nock scope

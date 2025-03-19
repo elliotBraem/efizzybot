@@ -12,8 +12,7 @@ import { createMockCuratorTweet, createMockTweet } from "../utils/test-data";
 import {
   cleanupTestServer,
   mockTwitterSearchTimeline,
-  setupDefaultTwitterMocks,
-  setupTestServer,
+  setupTestServer
 } from "../utils/test-helpers";
 
 describe("Submission Flow", () => {
@@ -28,7 +27,7 @@ describe("Submission Flow", () => {
 
     // Disable external network requests
     nock.disableNetConnect();
-    nock.enableNetConnect("127.0.0.1");
+    nock.enableNetConnect(/(127\.0\.0\.1|localhost)/);
   });
 
   afterAll(async () => {
@@ -38,7 +37,6 @@ describe("Submission Flow", () => {
 
   beforeEach(() => {
     nock.cleanAll();
-    setupDefaultTwitterMocks();
   });
 
   afterEach(() => {
@@ -50,20 +48,15 @@ describe("Submission Flow", () => {
     const tweet = createMockTweet();
     const curatorTweet = createMockCuratorTweet(tweet.id);
 
-    // Mock Twitter API to return the original tweet
-    nock("https://api.twitter.com")
-      .get(`/tweets/${tweet.id}`)
-      .reply(200, tweet);
-
     // Mock the fetchSearchTweets response to include our curator tweet
-    mockTwitterSearchTimeline([curatorTweet]);
+    mockTwitterSearchTimeline([tweet, curatorTweet]);
 
     // Manually trigger the checkMentions method
     await server.context.submissionService["checkMentions"]();
 
     // Verify the submission was saved
     const submissionResponse = await apiClient.get(
-      `/api/submission/${tweet.id}`,
+      `/api/submission/single/${tweet.id}`,
     );
     expect(submissionResponse.status).toBe(200);
     expect(submissionResponse.data).toMatchObject({
@@ -79,13 +72,8 @@ describe("Submission Flow", () => {
     const feedIds = ["feed1", "feed2", "feed3"];
     const curatorTweet = createMockCuratorTweet(tweet.id, feedIds);
 
-    // Mock Twitter API
-    nock("https://api.twitter.com")
-      .get(`/tweets/${tweet.id}`)
-      .reply(200, tweet);
-
     // Mock the fetchSearchTweets response to include our curator tweet
-    mockTwitterSearchTimeline([curatorTweet]);
+    mockTwitterSearchTimeline([tweet, curatorTweet]);
 
     // Manually trigger the checkMentions method
     await server.context.submissionService["checkMentions"]();
@@ -123,20 +111,15 @@ describe("Submission Flow", () => {
         ],
       });
 
-    // Mock Twitter API
-    nock("https://api.twitter.com")
-      .get(`/tweets/${tweet.id}`)
-      .reply(200, tweet);
-
     // Mock the fetchSearchTweets response to include our curator tweet
-    mockTwitterSearchTimeline([curatorTweet]);
+    mockTwitterSearchTimeline([tweet, curatorTweet]);
 
     // Manually trigger the checkMentions method
     await server.context.submissionService["checkMentions"]();
 
     // Verify the submission was auto-approved
     const submissionResponse = await apiClient.get(
-      `/api/submission/${tweet.id}`,
+      `/api/submission/single/${tweet.id}`,
     );
     expect(submissionResponse.status).toBe(200);
     expect(submissionResponse.data).toMatchObject({

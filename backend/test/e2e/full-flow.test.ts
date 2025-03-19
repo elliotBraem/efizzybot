@@ -39,7 +39,7 @@ describe("Full Flow E2E", () => {
 
     // Disable external network requests but allow localhost
     nock.disableNetConnect();
-    nock.enableNetConnect("127.0.0.1");
+    nock.enableNetConnect(/(127\.0\.0\.1|localhost)/);
     setupDefaultTwitterMocks();
   });
 
@@ -80,7 +80,7 @@ describe("Full Flow E2E", () => {
 
     // Verify the submission was created
     const submissionStatusResponse = await apiClient.get(
-      `/api/submission/${tweet.id}`,
+      `/api/submission/single/${tweet.id}`,
     );
     expect(submissionStatusResponse.status).toBe(200);
     expect(submissionStatusResponse.data).toMatchObject({
@@ -99,7 +99,7 @@ describe("Full Flow E2E", () => {
 
     // Verify the submission was approved
     const approvedSubmissionResponse = await apiClient.get(
-      `/api/submission/${tweet.id}`,
+      `/api/submission/single/${tweet.id}`,
     );
     expect(approvedSubmissionResponse.status).toBe(200);
     expect(approvedSubmissionResponse.data).toMatchObject({
