@@ -669,6 +669,63 @@
       }
     },
     {
+      "id": "defi",
+      "name": "DeFi News",
+      "description": "Chain agnostic Decentralized Finance news, product updates, traction, thought leadership, innovation",
+      "moderation": {
+        "approvers": {
+          "twitter": [
+            "potlock_",
+            "plugrel",
+            "potlock_intern"
+          ]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "ma",
+      "name": "Mergers & Acquisitions",
+      "description": "Tech mergers and acquisitions",
+      "moderation": {
+        "approvers": {
+          "twitter": [
+            "plugrel",
+            "potlock_intern"
+          ]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "web3social",
+      "name": "Web3 Social",
+      "description": "Decentralized social, Social FI product updates, news, traction, thought leadership.",
+      "moderation": {
+        "approvers": {
+          "twitter": [
+            "elliot_braem",
+            "potlock_",
+            "plugrel",
+            "potlock_intern"
+          ]
+        }
+      },
+      "outputs": {
+        "stream": {
+          "enabled": false
+        }
+      }
+    },
+    {
       "id": "networkstate",
       "name": "Network State News",
       "description": "Network states & intentional communities",
