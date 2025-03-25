@@ -39,13 +39,15 @@ jobs:
         run: pnpm install
 
       - name: Migrate and seed DB
+        working-directory: ./backend
         run: pnpm run db:migrate
 
       - name: Seed DB
+        working-directory: ./backend
         run: pnpm run db:seed:test
 
       - name: Run tests
-        run: pnpm test
+        run: pnpm test:ci
         env:
           NODE_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@postgres_test:5433/test
