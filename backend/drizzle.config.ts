@@ -5,8 +5,6 @@ export default {
   out: "./src/services/db/migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url:
-      process.env.DATABASE_URL ||
-      "postgresql://postgres:postgres@localhost:5432/curatedotfun",
+    url: process.env.DATABASE_URL || '',
   },
 } satisfies Config;

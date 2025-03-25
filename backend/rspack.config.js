@@ -10,7 +10,6 @@ module.exports = {
   target: "async-node",
   devtool: "source-map",
   externals: {
-    "better-sqlite3": "commonjs better-sqlite3",
     bufferutil: "commonjs bufferutil",
   },
   output: {

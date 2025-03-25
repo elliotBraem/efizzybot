@@ -16,14 +16,7 @@ describe("Database Integration", () => {
 
   beforeAll(async () => {
     try {
-      // Set environment variables for test database
-      process.env.DATABASE_URL =
-        "postgresql://postgres:postgres@localhost:54321/test";
-      process.env.DATABASE_WRITE_URL =
-        "postgresql://postgres:postgres@localhost:54321/test";
-      process.env.DATABASE_READ_URL =
-        "postgresql://postgres:postgres@localhost:54321/test";
-
+      console.log("Trying to connect to: ", process.env.DATABASE_URL)
       // Create a direct connection to the test database for cleanup operations
       pgPool = new Pool({
         connectionString: process.env.DATABASE_URL,
