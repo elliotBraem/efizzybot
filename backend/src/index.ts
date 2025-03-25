@@ -16,7 +16,7 @@ import {
   cleanup,
   createHighlightBox,
   createSection,
-  logger
+  logger,
 } from "./utils/logger";
 
 const PORT = Number(process.env.PORT) || 3000;
@@ -77,9 +77,9 @@ async function startServer() {
       `📡 Available at:`,
       `http://localhost:${PORT}`,
       ``,
-      `✨ Ready and accepting connections`
-    ].join('\n');
-    
+      `✨ Ready and accepting connections`,
+    ].join("\n");
+
     createHighlightBox(serverMessage);
 
     createSection("SERVICES");

@@ -5,7 +5,7 @@
     "build": "rspack build",
     "start": "node dist/main.js",
     "dev": "concurrently \"NODE_ENV=development rspack build --watch\" \"wait-on -d 500 dist/main.js && node scripts/dev-server.js\"",
-    "test": "bun test test/integration",
+    "test": "bun test",
     "clean": "rm -rf dist coverage .turbo",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config drizzle.config.ts",
@@ -37,13 +37,7 @@
     "axios": "^1.6.8",
     "concurrently": "^9.1.2",
     "drizzle-seed": "^0.3.1",
-    "jest": "^29.7.0",
-    "jest-mock-extended": "^4.0.0-beta1",
     "nock": "^13.5.4",
-    "nodemon": "^3.1.9",
-    "testcontainers": "^10.7.2",
-    "ts-jest": "^29.2.5",
-    "ts-node": "^10.9.1",
     "typescript": "^5.3.3",
     "wait-on": "^8.0.2",
     "zod": "^3.22.4"
@@ -67,8 +61,6 @@
     "pg": "^8.14.1",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
-    "string-width": "^7.2.0",
-    "winston": "^3.17.0",
-    "winston-console-format": "^1.0.8"
+    "string-width": "^7.2.0"
   }
 }

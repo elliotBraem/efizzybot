@@ -4,26 +4,17 @@
   "devDependencies": {
     "@types/node": "^22.13.13",
     "concurrently": "^9.1.2",
-    "dockerize": "^0.1.0",
     "prettier": "^3.3.3",
     "turbo": "latest"
   },
   "packageManager": "pnpm@10.6.4",
   "private": true,
-  "workspaces": [
-    "backend",
-    "frontend"
-  ],
   "scripts": {
     "dev": "docker-compose --profile dev up -d postgres_dev && docker-compose --profile dev run --rm db-init-dev && turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start --filter=@curatedotfun/backend",
     "test": "docker-compose --profile test up -d postgres_test && docker-compose --profile test run --rm db-init-test && turbo run test --filter=@curatedotfun/backend || true && docker-compose --profile test down -v",
     "test:ci": "turbo run test --filter=@curatedotfun/backend",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:reset": "docker-compose down -v && docker-compose up -d",
-    "docker:logs": "docker-compose logs -f",
     "lint": "turbo run lint",
     "clean": "turbo run clean",
     "fmt": "prettier --write '**/*.{js,jsx,ts,tsx,json}'",
