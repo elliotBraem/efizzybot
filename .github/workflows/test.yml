@@ -19,7 +19,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: test
         options: >-
-          --health-cmd pg_isready -u postgres -d test
+          --health-cmd "pg_isready -U postgres -d test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 3
@@ -49,4 +49,3 @@ jobs:
         env:
           NODE_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@postgres_test:5433/test
-
