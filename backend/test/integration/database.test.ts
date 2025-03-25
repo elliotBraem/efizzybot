@@ -16,7 +16,7 @@ describe("Database Integration", () => {
 
   beforeAll(async () => {
     try {
-      console.log("Trying to connect to: ", process.env.DATABASE_URL)
+      console.log("Trying to connect to: ", process.env.DATABASE_URL);
       // Create a direct connection to the test database for cleanup operations
       pgPool = new Pool({
         connectionString: process.env.DATABASE_URL,
