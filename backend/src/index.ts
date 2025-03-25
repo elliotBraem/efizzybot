@@ -9,16 +9,15 @@ if (process.env.NODE_ENV === "test") {
 }
 
 import { serve } from "@hono/node-server";
+import { AppInstance } from "types/app";
 import { createApp } from "./app";
+import { db, initializeDatabase } from "./services/db";
 import {
   cleanup,
-  failSpinner,
-  logger,
-  startSpinner,
-  succeedSpinner,
+  createHighlightBox,
+  createSection,
+  logger
 } from "./utils/logger";
-import { AppInstance } from "types/app";
-import { db, initializeDatabase } from "./services/db";
 
 const PORT = Number(process.env.PORT) || 3000;
 
@@ -38,16 +37,13 @@ async function getInstance(): Promise<AppInstance> {
 
 async function startServer() {
   try {
-    startSpinner("server", "Starting server...");
+    createSection("⚡ STARTING SERVER ⚡");
 
     // Initialize database in production, but not in tests
     if (process.env.NODE_ENV !== "test") {
-      startSpinner("database", "Initializing database...");
       const dbInitialized = await initializeDatabase();
       if (dbInitialized) {
-        succeedSpinner("database", "Database initialized");
       } else {
-        failSpinner("database", "Failed to initialize database");
         logger.warn("Continuing without database connection");
       }
     }
@@ -74,58 +70,73 @@ async function startServer() {
       port: PORT,
     });
 
-    succeedSpinner("server", `Server running on port ${PORT}`);
+    // Create a multi-line message for the highlight box
+    const serverMessage = [
+      `🚀 SERVER RUNNING 🚀`,
+      ``,
+      `📡 Available at:`,
+      `http://localhost:${PORT}`,
+      ``,
+      `✨ Ready and accepting connections`
+    ].join('\n');
+    
+    createHighlightBox(serverMessage);
+
+    createSection("SERVICES");
 
     // Start checking for mentions only if Twitter service is available
     if (context.submissionService) {
-      startSpinner("submission-monitor", "Starting submission monitoring...");
       await context.submissionService.startMentionsCheck();
-      succeedSpinner("submission-monitor", "Submission monitoring started");
     }
 
     // Graceful shutdown handler
     const gracefulShutdown = async (signal: string) => {
-      startSpinner("shutdown", `Shutting down gracefully (${signal})...`);
+      createSection("🛑 SHUTTING DOWN 🛑");
+      logger.info(`Graceful shutdown initiated (${signal})`);
+
       try {
         // Wait for server to close
         await new Promise<void>((resolve, reject) => {
           server.close((err) => (err ? reject(err) : resolve()));
         });
+        logger.info("HTTP server closed");
 
         const shutdownPromises = [];
-        if (context.twitterService)
+        if (context.twitterService) {
           shutdownPromises.push(context.twitterService.stop());
-        if (context.submissionService)
+          logger.info("Twitter service stopped");
+        }
+
+        if (context.submissionService) {
           shutdownPromises.push(context.submissionService.stop());
-        if (context.distributionService)
+          logger.info("Submission service stopped");
+        }
+
+        if (context.distributionService) {
           shutdownPromises.push(context.distributionService.shutdown());
+          logger.info("Distribution service stopped");
+        }
 
         shutdownPromises.push(db.disconnect());
 
         await Promise.all(shutdownPromises);
-        succeedSpinner("shutdown", "Shutdown complete");
+        logger.info("Database connections closed");
 
         // Reset instance for clean restart
         instance = null;
 
+        logger.info("Shutdown complete");
         process.exit(0);
       } catch (error) {
-        failSpinner("shutdown", "Error during shutdown");
-        logger.error("Shutdown", error);
+        logger.error("Error during shutdown:", error);
         process.exit(1);
       }
     };
 
     // Handle manual shutdown (Ctrl+C)
     process.once("SIGINT", () => gracefulShutdown("SIGINT"));
-
-    logger.info("🚀 Server is running and ready");
   } catch (error) {
-    // Handle any initialization errors
-    ["server", "submission-monitor"].forEach((key) => {
-      failSpinner(key, `Failed during ${key}`);
-    });
-    logger.error("Startup", error);
+    logger.error("Error during startup:", error);
     cleanup();
     process.exit(1);
   }

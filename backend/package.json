@@ -4,7 +4,7 @@
   "scripts": {
     "build": "rspack build",
     "start": "node dist/main.js",
-    "dev": "NODE_ENV=development nodemon",
+    "dev": "concurrently \"NODE_ENV=development rspack build --watch\" \"wait-on -d 500 dist/main.js && node scripts/dev-server.js\"",
     "test": "bun test test/integration",
     "clean": "rm -rf dist coverage .turbo",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
@@ -65,6 +65,9 @@
     "lodash": "^4.17.21",
     "ora": "^8.1.1",
     "pg": "^8.14.1",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0",
+    "string-width": "^7.2.0",
     "winston": "^3.17.0",
     "winston-console-format": "^1.0.8"
   }

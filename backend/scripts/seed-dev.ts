@@ -4,7 +4,7 @@ import * as schema from "../src/services/db/schema";
 
 // Customize this seed file for your development purposes
 async function main() {
-  console.log("Seeding test database... ", process.env.DATABASE_URL);
+  console.log("Seeding dev database... ", process.env.DATABASE_URL);
 
   if (!process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL environment variable is required");
@@ -31,7 +31,7 @@ async function main() {
       TRUNCATE TABLE twitter_cache CASCADE;
     `);
 
-    console.log("Existing data cleared. Inserting test data...");
+    console.log("Existing data cleared. Inserting dev data...");
 
     // Insert feeds
     await db.insert(schema.feeds).values([
