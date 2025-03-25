@@ -48,5 +48,5 @@ jobs:
         run: pnpm test
         env:
           NODE_ENV: test
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5433/test
+          DATABASE_URL: postgresql://postgres:postgres@postgres_test:5433/test
 
