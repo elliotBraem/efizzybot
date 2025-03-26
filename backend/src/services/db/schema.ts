@@ -202,7 +202,5 @@ export const schedulerLocks = table(
     expiresAt: timestamp("expires_at").notNull(), // When the lock expires
     ...timestamps,
   },
-  (table) => [
-    index("scheduler_locks_expires_idx").on(table.expiresAt),
-  ],
+  (table) => [index("scheduler_locks_expires_idx").on(table.expiresAt)],
 );

@@ -10,11 +10,11 @@ const app = new Hono();
 // Get all scheduled jobs
 app.get("/", async (c) => {
   const { schedulerService } = c.get("context");
-  
+
   if (!schedulerService) {
     return c.json({ error: "Scheduler service not available" }, 503);
   }
-  
+
   try {
     const jobs = await schedulerService.getJobs();
     return c.json({ jobs });
@@ -28,18 +28,18 @@ app.get("/", async (c) => {
 app.get("/:id", async (c) => {
   const { schedulerService } = c.get("context");
   const id = c.req.param("id");
-  
+
   if (!schedulerService) {
     return c.json({ error: "Scheduler service not available" }, 503);
   }
-  
+
   try {
     const job = await schedulerService.getJob(id);
-    
+
     if (!job) {
       return c.json({ error: "Job not found" }, 404);
     }
-    
+
     return c.json({ job });
   } catch (error) {
     logger.error(`Error getting job ${id}:`, error);
@@ -61,16 +61,16 @@ app.post(
       isOneTime: z.boolean(),
       enabled: z.boolean(),
       config: z.any(),
-    })
+    }),
   ),
   async (c) => {
     const { schedulerService } = c.get("context");
     const body = await c.req.valid("json");
-    
+
     if (!schedulerService) {
       return c.json({ error: "Scheduler service not available" }, 503);
     }
-    
+
     try {
       const job = await schedulerService.createJob(body);
       return c.json({ job }, 201);
@@ -78,7 +78,7 @@ app.post(
       logger.error("Error creating job:", error);
       return c.json({ error: "Failed to create job" }, 500);
     }
-  }
+  },
 );
 
 // Update a job
@@ -95,48 +95,48 @@ app.put(
       isOneTime: z.boolean().optional(),
       enabled: z.boolean().optional(),
       config: z.any().optional(),
-    })
+    }),
   ),
   async (c) => {
     const { schedulerService } = c.get("context");
     const id = c.req.param("id");
     const body = await c.req.valid("json");
-    
+
     if (!schedulerService) {
       return c.json({ error: "Scheduler service not available" }, 503);
     }
-    
+
     try {
       const job = await schedulerService.updateJob(id, body);
-      
+
       if (!job) {
         return c.json({ error: "Job not found" }, 404);
       }
-      
+
       return c.json({ job });
     } catch (error) {
       logger.error(`Error updating job ${id}:`, error);
       return c.json({ error: "Failed to update job" }, 500);
     }
-  }
+  },
 );
 
 // Delete a job
 app.delete("/:id", async (c) => {
   const { schedulerService } = c.get("context");
   const id = c.req.param("id");
-  
+
   if (!schedulerService) {
     return c.json({ error: "Scheduler service not available" }, 503);
   }
-  
+
   try {
     const job = await schedulerService.deleteJob(id);
-    
+
     if (!job) {
       return c.json({ error: "Job not found" }, 404);
     }
-    
+
     return c.json({ success: true });
   } catch (error) {
     logger.error(`Error deleting job ${id}:`, error);
@@ -149,11 +149,11 @@ app.get("/:id/executions", async (c) => {
   const { schedulerService } = c.get("context");
   const id = c.req.param("id");
   const limit = c.req.query("limit") ? parseInt(c.req.query("limit")) : 10;
-  
+
   if (!schedulerService) {
     return c.json({ error: "Scheduler service not available" }, 503);
   }
-  
+
   try {
     const executions = await schedulerService.getJobExecutions(id, limit);
     return c.json({ executions });
@@ -167,11 +167,11 @@ app.get("/:id/executions", async (c) => {
 app.post("/:id/run", async (c) => {
   const { schedulerService } = c.get("context");
   const id = c.req.param("id");
-  
+
   if (!schedulerService) {
     return c.json({ error: "Scheduler service not available" }, 503);
   }
-  
+
   try {
     const job = await schedulerService.runJobNow(id);
     return c.json({ success: true, job });

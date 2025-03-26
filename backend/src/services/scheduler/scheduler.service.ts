@@ -1,13 +1,13 @@
-import { nanoid } from 'nanoid';
-import { DatabaseService } from '../db';
-import { SchedulerDatabase } from './scheduler.db';
-import { JobStatus, JobType } from '../db/schema';
-import { logger } from '../../utils/logger';
-import { ConfigService } from '../config/config.service';
-import { ProcessorService } from '../processor/processor.service';
-import { DistributionService } from '../distribution/distribution.service';
-import * as cronParser from 'cron-parser';
-import { FeedConfig, RecapConfig } from '../../types/config';
+import { nanoid } from "nanoid";
+import { DatabaseService } from "../db";
+import { SchedulerDatabase } from "./scheduler.db";
+import { JobStatus, JobType } from "../db/schema";
+import { logger } from "../../utils/logger";
+import { ConfigService } from "../config/config.service";
+import { ProcessorService } from "../processor/processor.service";
+import { DistributionService } from "../distribution/distribution.service";
+import * as cronParser from "cron-parser";
+import { FeedConfig, RecapConfig } from "../../types/config";
 
 /**
  * Service for managing scheduled jobs
@@ -15,7 +15,7 @@ import { FeedConfig, RecapConfig } from '../../types/config';
 export class SchedulerService {
   private db: SchedulerDatabase;
   private nodeId: string;
-  private leaderLockId = 'scheduler-leader';
+  private leaderLockId = "scheduler-leader";
   private leaderLockTtl = 30000; // 30 seconds
   private leaderCheckInterval: NodeJS.Timer | null = null;
   private jobCheckInterval: NodeJS.Timer | null = null;
@@ -26,7 +26,7 @@ export class SchedulerService {
     dbService: DatabaseService,
     private configService: ConfigService,
     private processorService: ProcessorService,
-    private distributionService: DistributionService
+    private distributionService: DistributionService,
   ) {
     this.db = new SchedulerDatabase(dbService);
     // Generate a unique ID for this node
@@ -43,7 +43,7 @@ export class SchedulerService {
     }
 
     this.isRunning = true;
-    logger.info('Starting scheduler service');
+    logger.info("Starting scheduler service");
 
     // Start leader election process
     this.startLeaderElection();
@@ -63,7 +63,7 @@ export class SchedulerService {
       return;
     }
 
-    logger.info('Stopping scheduler service');
+    logger.info("Stopping scheduler service");
 
     // Clear intervals
     if (this.leaderCheckInterval) {
@@ -99,11 +99,11 @@ export class SchedulerService {
         const renewed = await this.db.renewLeaderLock(
           this.leaderLockId,
           this.nodeId,
-          this.leaderLockTtl
+          this.leaderLockTtl,
         );
 
         if (!renewed) {
-          logger.warn('Failed to renew leader lock, stepping down as leader');
+          logger.warn("Failed to renew leader lock, stepping down as leader");
           this.isLeader = false;
         }
       } else {
@@ -120,7 +120,7 @@ export class SchedulerService {
     const acquired = await this.db.acquireLeaderLock(
       this.leaderLockId,
       this.nodeId,
-      this.leaderLockTtl
+      this.leaderLockTtl,
     );
 
     if (acquired && !this.isLeader) {
@@ -152,17 +152,17 @@ export class SchedulerService {
 
     try {
       const dueJobs = await this.db.getDueJobs();
-      
+
       if (dueJobs.length > 0) {
         logger.info(`Found ${dueJobs.length} due jobs to execute`);
-        
+
         // Execute each job
         for (const job of dueJobs) {
           this.executeJob(job);
         }
       }
     } catch (error) {
-      logger.error('Error checking for due jobs:', error);
+      logger.error("Error checking for due jobs:", error);
     }
   }
 
@@ -171,22 +171,22 @@ export class SchedulerService {
    */
   private async executeJob(job: any) {
     logger.info(`Executing job: ${job.name} (${job.id})`);
-    
+
     // Create execution record
     const executionId = nanoid();
     const startTime = new Date();
-    
+
     try {
       await this.db.createJobExecution({
         id: executionId,
         jobId: job.id,
         startedAt: startTime,
-        status: JobStatus.RUNNING
+        status: JobStatus.RUNNING,
       });
-      
+
       // Execute the job based on its type
       let result;
-      
+
       switch (job.job_type) {
         case JobType.RECAP:
           result = await this.executeRecapJob(job);
@@ -195,61 +195,61 @@ export class SchedulerService {
         default:
           throw new Error(`Unknown job type: ${job.job_type}`);
       }
-      
+
       // Update job execution record
       const endTime = new Date();
       const durationMs = endTime.getTime() - startTime.getTime();
-      
+
       await this.db.updateJobExecution(executionId, {
         completedAt: endTime,
         status: JobStatus.SUCCESS,
         result,
-        duration: `${durationMs}ms`
+        duration: `${durationMs}ms`,
       });
-      
+
       // Update job's last run time and calculate next run time
       const lastRunAt = new Date();
       let nextRunAt = null;
-      
+
       if (!job.is_one_time) {
         nextRunAt = this.calculateNextRunTime(job.schedule);
       }
-      
+
       await this.db.updateScheduledJob(job.id, {
         lastRunAt,
         nextRunAt: nextRunAt || undefined,
         // If it's a one-time job, disable it after execution
-        enabled: job.is_one_time ? false : job.enabled
+        enabled: job.is_one_time ? false : job.enabled,
       });
-      
+
       logger.info(`Job ${job.name} (${job.id}) completed successfully`);
     } catch (error) {
       logger.error(`Error executing job ${job.name} (${job.id}):`, error);
-      
+
       // Update job execution record with error
       const endTime = new Date();
       const durationMs = endTime.getTime() - startTime.getTime();
-      
+
       await this.db.updateJobExecution(executionId, {
         completedAt: endTime,
         status: JobStatus.FAILED,
         error: error instanceof Error ? error.message : String(error),
-        duration: `${durationMs}ms`
+        duration: `${durationMs}ms`,
       });
-      
+
       // Still update the job's last run time and next run time
       const lastRunAt = new Date();
       let nextRunAt = null;
-      
+
       if (!job.is_one_time) {
         nextRunAt = this.calculateNextRunTime(job.schedule);
       }
-      
+
       await this.db.updateScheduledJob(job.id, {
         lastRunAt,
         nextRunAt: nextRunAt || undefined,
         // If it's a one-time job, disable it after execution even if it failed
-        enabled: job.is_one_time ? false : job.enabled
+        enabled: job.is_one_time ? false : job.enabled,
       });
     }
   }
@@ -260,42 +260,43 @@ export class SchedulerService {
   private async executeRecapJob(job: any) {
     const config = job.config;
     const feedId = job.feed_id;
-    
+
     if (!feedId) {
-      throw new Error('Recap job requires a feed ID');
+      throw new Error("Recap job requires a feed ID");
     }
-    
+
     // Get the feed configuration
     const feed = await this.configService.getFeedConfig(feedId);
-    
+
     if (!feed) {
       throw new Error(`Feed not found: ${feedId}`);
     }
-    
+
     // Check if the feed has a recap output configured
     if (!feed.outputs?.recap?.enabled) {
       throw new Error(`Recap is not enabled for feed: ${feedId}`);
     }
-    
+
     // Get approved submissions for the feed within the specified time range
-    const fromDate = config.fromDate ? new Date(config.fromDate) : 
-      new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Default to 1 week ago
-    
+    const fromDate = config.fromDate
+      ? new Date(config.fromDate)
+      : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // Default to 1 week ago
+
     const toDate = config.toDate ? new Date(config.toDate) : new Date();
-    
+
     // TODO: Implement the actual recap logic
     // This would involve:
     // 1. Getting approved submissions for the feed within the date range
     // 2. Processing them through the transformation pipeline
     // 3. Distributing the results
-    
+
     // For now, we'll just return a placeholder result
     return {
       feedId,
       fromDate,
       toDate,
-      status: 'completed',
-      message: 'Recap job executed successfully'
+      status: "completed",
+      message: "Recap job executed successfully",
     };
   }
 
@@ -318,19 +319,19 @@ export class SchedulerService {
   private async syncJobsFromConfig() {
     try {
       const config = await this.configService.getConfig();
-      
+
       if (!config || !config.feeds) {
         return;
       }
-      
+
       // Process each feed
       for (const feed of config.feeds) {
         await this.syncFeedJobs(feed);
       }
-      
-      logger.info('Synced scheduled jobs from config');
+
+      logger.info("Synced scheduled jobs from config");
     } catch (error) {
-      logger.error('Error syncing jobs from config:', error);
+      logger.error("Error syncing jobs from config:", error);
     }
   }
 
@@ -342,7 +343,7 @@ export class SchedulerService {
     if (feed.outputs?.recap?.enabled) {
       await this.syncRecapJob(feed);
     }
-    
+
     // Add other job types here as needed
   }
 
@@ -351,43 +352,43 @@ export class SchedulerService {
    */
   private async syncRecapJob(feed: FeedConfig) {
     const recapOutput = feed.outputs?.recap;
-    
+
     if (!recapOutput || !recapOutput.enabled) {
       return;
     }
-    
+
     // Check if a recap job already exists for this feed
     const existingJobs = await this.db.getScheduledJobs({
       jobType: JobType.RECAP,
-      feedId: feed.id
+      feedId: feed.id,
     });
-    
+
     const jobName = `${feed.name} Recap`;
     const jobConfig = {
       transformations: recapOutput.transform || [],
       distributions: recapOutput.distribute || [],
       // Default to weekly recap if not specified
-      schedule: recapOutput.schedule || '0 0 * * 0', // Every Sunday at midnight
+      schedule: recapOutput.schedule || "0 0 * * 0", // Every Sunday at midnight
       fromDate: null, // Will be calculated at runtime
-      toDate: null // Will be calculated at runtime
+      toDate: null, // Will be calculated at runtime
     };
-    
+
     if (existingJobs.length > 0) {
       // Update existing job
       const existingJob = existingJobs[0];
-      
+
       await this.db.updateScheduledJob(existingJob.id, {
         name: jobName,
         schedule: jobConfig.schedule,
         enabled: recapOutput.enabled,
-        config: jobConfig
+        config: jobConfig,
       });
-      
+
       logger.info(`Updated recap job for feed: ${feed.name}`);
     } else {
       // Create new job
       const jobId = `recap-${feed.id}`;
-      
+
       await this.db.createScheduledJob({
         id: jobId,
         name: jobName,
@@ -398,9 +399,9 @@ export class SchedulerService {
         isOneTime: false,
         enabled: recapOutput.enabled,
         nextRunAt: this.calculateNextRunTime(jobConfig.schedule) || undefined,
-        config: jobConfig
+        config: jobConfig,
       });
-      
+
       logger.info(`Created recap job for feed: ${feed.name}`);
     }
   }
@@ -408,11 +409,13 @@ export class SchedulerService {
   /**
    * Get all scheduled jobs
    */
-  async getJobs(options: {
-    enabled?: boolean;
-    jobType?: JobType;
-    feedId?: string;
-  } = {}) {
+  async getJobs(
+    options: {
+      enabled?: boolean;
+      jobType?: JobType;
+      feedId?: string;
+    } = {},
+  ) {
     return await this.db.getScheduledJobs(options);
   }
 
@@ -437,12 +440,14 @@ export class SchedulerService {
     config: any;
   }) {
     const id = nanoid();
-    const nextRunAt = job.enabled ? this.calculateNextRunTime(job.schedule) : null;
-    
+    const nextRunAt = job.enabled
+      ? this.calculateNextRunTime(job.schedule)
+      : null;
+
     return await this.db.createScheduledJob({
       id,
       ...job,
-      nextRunAt: nextRunAt || undefined
+      nextRunAt: nextRunAt || undefined,
     });
   }
 
@@ -460,7 +465,7 @@ export class SchedulerService {
       isOneTime: boolean;
       enabled: boolean;
       config: any;
-    }>
+    }>,
   ) {
     // If schedule is being updated, recalculate next run time
     let nextRunAt;
@@ -470,7 +475,7 @@ export class SchedulerService {
         nextRunAt = this.calculateNextRunTime(job.schedule);
       }
     }
-    
+
     // If enabled is being set to true, calculate next run time
     if (job.enabled === true) {
       const existingJob = await this.db.getScheduledJob(id);
@@ -478,10 +483,10 @@ export class SchedulerService {
         nextRunAt = this.calculateNextRunTime(existingJob.schedule);
       }
     }
-    
+
     return await this.db.updateScheduledJob(id, {
       ...job,
-      nextRunAt: nextRunAt || undefined
+      nextRunAt: nextRunAt || undefined,
     });
   }
 
@@ -504,14 +509,14 @@ export class SchedulerService {
    */
   async runJobNow(id: string) {
     const job = await this.db.getScheduledJob(id);
-    
+
     if (!job) {
       throw new Error(`Job not found: ${id}`);
     }
-    
+
     // Execute the job
     await this.executeJob(job);
-    
+
     return job;
   }
 }

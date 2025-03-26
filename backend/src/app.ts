@@ -68,9 +68,9 @@ export async function createApp(): Promise<AppInstance> {
     db,
     configService,
     processorService,
-    distributionService
+    distributionService,
   );
-  
+
   // Sync config to database
   try {
     await configSyncService.syncRecapConfigs();
@@ -78,7 +78,7 @@ export async function createApp(): Promise<AppInstance> {
   } catch (error) {
     logger.error("Failed to sync recap configurations:", error);
   }
-  
+
   // Start scheduler service
   try {
     await schedulerService.start();
@@ -134,8 +134,8 @@ export async function createApp(): Promise<AppInstance> {
     app.route("", staticRoutes);
   }
 
-  return { 
-    app, 
+  return {
+    app,
     context,
     cleanup: async () => {
       // Cleanup function to stop services when app is shutting down
@@ -143,6 +143,6 @@ export async function createApp(): Promise<AppInstance> {
         await schedulerService.stop();
         logger.info("Scheduler service stopped");
       }
-    }
+    },
   };
 }

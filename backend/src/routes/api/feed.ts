@@ -77,45 +77,48 @@ router.post("/:feedId/process", async (c) => {
 router.post("/:feedId/recap", async (c) => {
   const context = c.get("context");
   const feedId = c.req.param("feedId");
-  
+
   const feed = context.configService.getFeedConfig(feedId);
   if (!feed || !feed.outputs.recap?.enabled) {
     return c.notFound();
   }
-  
+
   // Get approved submissions for this feed
   const submissions = await db.getSubmissionsByFeed(feedId);
   const approvedSubmissions = submissions.filter(
     (sub) => sub.status === "approved",
   );
-  
+
   if (approvedSubmissions.length === 0) {
     return c.json({ processed: 0 });
   }
-  
+
   // Process batch for recap
   if (!context.processorService) {
     throw serviceUnavailable("Processor");
   }
-  
+
   try {
     await context.processorService.processBatch(
-      approvedSubmissions, 
-      feed.outputs.recap
+      approvedSubmissions,
+      feed.outputs.recap,
     );
-    
-    return c.json({ 
+
+    return c.json({
       processed: approvedSubmissions.length,
       feedId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
     logger.error(`Error processing recap for feed ${feedId}:`, error);
-    return c.json({ 
-      error: `Failed to process recap: ${error.message || String(error)}`,
-      feedId,
-      timestamp: new Date().toISOString()
-    }, 500);
+    return c.json(
+      {
+        error: `Failed to process recap: ${error.message || String(error)}`,
+        feedId,
+        timestamp: new Date().toISOString(),
+      },
+      500,
+    );
   }
 });
 

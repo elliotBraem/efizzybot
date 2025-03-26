@@ -37,7 +37,7 @@ export async function getScheduledJobs(
     enabled?: boolean;
     jobType?: JobType;
     feedId?: string;
-  } = {}
+  } = {},
 ) {
   let query = db.select().from(scheduledJobs);
 
@@ -69,15 +69,12 @@ export async function getDueJobs(db: NodePgDatabase<any>) {
     .where(
       and(
         eq(scheduledJobs.enabled, true),
-        or(
-          lt(scheduledJobs.nextRunAt, now),
-          eq(scheduledJobs.nextRunAt, now)
-        ),
+        or(lt(scheduledJobs.nextRunAt, now), eq(scheduledJobs.nextRunAt, now)),
         // Check that nextRunAt is not null
-        not(isNull(scheduledJobs.nextRunAt))
-      )
+        not(isNull(scheduledJobs.nextRunAt)),
+      ),
     );
-  
+
   return results;
 }
 
@@ -89,7 +86,7 @@ export async function getScheduledJob(db: NodePgDatabase<any>, id: string) {
     .select()
     .from(scheduledJobs)
     .where(eq(scheduledJobs.id, id));
-  
+
   return results.length > 0 ? results[0] : null;
 }
 
@@ -109,7 +106,7 @@ export async function createScheduledJob(
     enabled: boolean;
     nextRunAt?: Date;
     config: any;
-  }
+  },
 ) {
   return await db.insert(scheduledJobs).values(job).returning();
 }
@@ -131,7 +128,7 @@ export async function updateScheduledJob(
     lastRunAt: Date;
     nextRunAt: Date;
     config: any;
-  }>
+  }>,
 ) {
   return await db
     .update(scheduledJobs)
@@ -147,7 +144,10 @@ export async function updateScheduledJob(
  * Delete a scheduled job
  */
 export async function deleteScheduledJob(db: NodePgDatabase<any>, id: string) {
-  return await db.delete(scheduledJobs).where(eq(scheduledJobs.id, id)).returning();
+  return await db
+    .delete(scheduledJobs)
+    .where(eq(scheduledJobs.id, id))
+    .returning();
 }
 
 /**
@@ -156,7 +156,7 @@ export async function deleteScheduledJob(db: NodePgDatabase<any>, id: string) {
 export async function getJobExecutions(
   db: NodePgDatabase<any>,
   jobId: string,
-  limit = 10
+  limit = 10,
 ) {
   return await db
     .select()
@@ -178,7 +178,7 @@ export async function createJobExecution(
     status: JobStatus;
     error?: string;
     result?: any;
-  }
+  },
 ) {
   return await db.insert(jobExecutions).values(execution).returning();
 }
@@ -195,7 +195,7 @@ export async function updateJobExecution(
     error: string;
     result: any;
     duration: string;
-  }>
+  }>,
 ) {
   return await db
     .update(jobExecutions)
@@ -211,11 +211,11 @@ export async function acquireLeaderLock(
   db: NodePgDatabase<any>,
   lockId: string,
   nodeId: string,
-  ttlMs: number
+  ttlMs: number,
 ): Promise<boolean> {
   const now = Date.now();
   const expiry = new Date(now + ttlMs);
-  
+
   try {
     // Try to insert or update the lock
     const result = await db.execute(sql`
@@ -228,7 +228,7 @@ export async function acquireLeaderLock(
       WHERE scheduler_locks.expires_at < ${new Date(now)}
       RETURNING *
     `);
-    
+
     return result.rowCount != null && result.rowCount > 0;
   } catch (error) {
     console.error("Error acquiring leader lock:", error);
@@ -243,25 +243,25 @@ export async function renewLeaderLock(
   db: NodePgDatabase<any>,
   lockId: string,
   nodeId: string,
-  ttlMs: number
+  ttlMs: number,
 ): Promise<boolean> {
   const expiry = new Date(Date.now() + ttlMs);
-  
+
   try {
     const result = await db
       .update(schedulerLocks)
-      .set({ 
+      .set({
         expiresAt: expiry,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .where(
         and(
           eq(schedulerLocks.lockId, lockId),
-          eq(schedulerLocks.nodeId, nodeId)
-        )
+          eq(schedulerLocks.nodeId, nodeId),
+        ),
       )
       .returning();
-    
+
     return result.length > 0;
   } catch (error) {
     console.error("Error renewing leader lock:", error);
@@ -275,7 +275,7 @@ export async function renewLeaderLock(
 export async function releaseLeaderLock(
   db: NodePgDatabase<any>,
   lockId: string,
-  nodeId: string
+  nodeId: string,
 ): Promise<boolean> {
   try {
     const result = await db
@@ -283,11 +283,11 @@ export async function releaseLeaderLock(
       .where(
         and(
           eq(schedulerLocks.lockId, lockId),
-          eq(schedulerLocks.nodeId, nodeId)
-        )
+          eq(schedulerLocks.nodeId, nodeId),
+        ),
       )
       .returning();
-    
+
     return result.length > 0;
   } catch (error) {
     console.error("Error releasing leader lock:", error);
