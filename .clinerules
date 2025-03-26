@@ -1,0 +1,91 @@
+# Project Rules and Patterns
+
+## Development Patterns
+
+### Package Management
+- Use pnpm for package management (pnpm@10.6.4)
+- Use Corepack for package manager versioning
+- Bun is used for running scripts and tests
+- Save type errors and dependency installations until ready to address them
+
+### Database
+- PostgreSQL with Drizzle ORM is the primary database
+- Use Docker-based development environment for PostgreSQL
+- Implement read/write separation for scalability
+- Use transaction support with retry logic
+
+### Testing
+- Focus on component tests as primary testing strategy
+- Use Docker-Compose for real database and infrastructure testing
+- Implement a fake MQ for message queue testing
+- Follow the testing plan outlined in memory-bank/testingPlan.md
+
+### Code Organization
+- Use service-based architecture
+- Implement plugin system for extensibility
+- Follow clean architecture principles
+- Use TypeScript strict mode
+
+### Monorepo Structure
+- Use Turborepo for build orchestration and caching
+- Bun workspaces for dependency management
+- Separate backend and frontend as distinct workspaces
+
+## Project Preferences
+
+### Code Style
+- Use ESLint and Prettier for code formatting
+- Follow TypeScript strict mode guidelines
+- Organize imports consistently
+- Use consistent naming conventions
+
+### Error Handling
+- Implement granular error types
+- Use graceful degradation strategies
+- Implement comprehensive error logging
+- Use error recovery mechanisms
+
+### JSON Sanitization
+- Sanitize JSON throughout the transformation pipeline
+- Handle BOM characters properly
+- Handle nested stringified JSON
+- Implement proper error handling for malformed JSON
+
+## Critical Implementation Paths
+
+### Content Flow
+1. Twitter submission → SubmissionService
+2. Moderation via Twitter → Status update
+3. ProcessorService → Global transforms
+4. DistributionService → Distributor-specific transforms
+5. Distribution to configured channels
+
+### Plugin System
+1. PluginService loads plugins at runtime
+2. Plugins register with appropriate service
+3. Services use plugins based on configuration
+4. Error handling and recovery for plugin failures
+
+### Database Operations
+1. Connection pooling with read/write separation
+2. Transaction support with retry logic
+3. Error handling and connection management
+4. Type-safe queries with Drizzle ORM
+
+## Known Challenges
+
+### Testing Infrastructure
+- Current testing approach relies too heavily on mocks
+- Need to implement Docker-based testing infrastructure
+- Need to refactor tests to use real database
+- Need to implement component tests for key flows
+
+### PostgreSQL Migration
+- Migration from SQLite to PostgreSQL in progress
+- Need to update database service implementation
+- Need to migrate existing data
+
+### Performance Optimization
+- Need to optimize resource usage
+- Need to implement performance monitoring
+- Need to identify and address bottlenecks
