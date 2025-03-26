@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { ConfigService } from "../services/config/config.service";
+import { ConfigSyncService } from "../services/config/config-sync.service";
 import { DistributionService } from "../services/distribution/distribution.service";
 import { ProcessorService } from "../services/processor/processor.service";
+import { SchedulerService } from "../services/scheduler/scheduler.service";
 import { SubmissionService } from "../services/submissions/submission.service";
 import { TwitterService } from "../services/twitter/client";
 
@@ -14,6 +16,8 @@ export interface AppContext {
   distributionService: DistributionService | null;
   processorService: ProcessorService | null;
   configService: ConfigService;
+  schedulerService?: SchedulerService;
+  configSyncService?: ConfigSyncService;
 }
 
 /**
@@ -22,6 +26,7 @@ export interface AppContext {
 export interface AppInstance {
   app: HonoAppType;
   context: AppContext;
+  cleanup?: () => Promise<void>;
 }
 
 /**

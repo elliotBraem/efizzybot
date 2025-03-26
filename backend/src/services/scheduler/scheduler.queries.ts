@@ -1,32 +1,12 @@
 import { and, eq, sql, desc, lt, gt, or, isNull, not } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import {
-  SubmissionFeed,
-  Moderation,
-  TwitterSubmission,
-  SubmissionStatus,
-  TwitterSubmissionWithFeedData,
-  FeedStatus,
-} from "../../types/twitter";
-import {
-  feedPlugins,
-  feeds,
-  moderationHistory,
-  submissionCounts,
-  submissionFeeds,
-  submissions,
   scheduledJobs,
   jobExecutions,
   schedulerLocks,
   JobStatus,
   JobType,
-} from "./schema";
-import { DbQueryResult, DbFeedQueryResult, RawDbQueryResult } from "./types";
-
-// Existing queries...
-// (Keeping only the scheduler-related queries for brevity)
-
-// Scheduler Queries
+} from "../db/schema";
 
 /**
  * Get all scheduled jobs

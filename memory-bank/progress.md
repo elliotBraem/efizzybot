@@ -57,6 +57,11 @@
   - [x] Database service implementation
   - [x] Testing infrastructure with isolated test databases
 - [ ] Recap functionality
+  - [ ] Database schema for scheduled jobs
+  - [ ] Scheduler service implementation
+  - [ ] Leader election for distributed environments
+  - [ ] API endpoints for job management
+  - [ ] Integration with existing recap configuration
 - [ ] Enhanced analytics
 - [ ] Additional distributor plugins
 - [ ] Performance optimization
@@ -82,6 +87,11 @@
    - ~~Update database service implementation~~ ✓
    - ~~Configure testing environment~~ ✓
 3. Complete recap functionality
+   - Implement database schema for scheduled jobs
+   - Create scheduler service with leader election
+   - Build API endpoints for job management
+   - Integrate with existing recap configuration
+   - Support both recurring and one-time schedules
 4. Implement performance monitoring
 5. Expand distributor options
 6. Enhance transformation capabilities
