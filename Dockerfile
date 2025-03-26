@@ -21,6 +21,7 @@ WORKDIR /app
 
 # Copy pruned package.json files and workspace config
 COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/turbo.json ./turbo.json
 COPY --from=pruner /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
 

@@ -1,34 +1,67 @@
 services:
+  # DB service (shared configuration)
   postgres:
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: curatedotfun
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/scripts/init-db:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  postgres_test:
-    image: postgres:15
+  # Dev-specific postgres config
+  postgres_dev:
+    extends: postgres
+    container_name: postgres_dev
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: curatedotfun
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # dev persists volumes, so you don't lose your setup
+    profiles: ["dev"]
+
+  # Test-specific postgres config
+  postgres_test:
+    extends: postgres
+    container_name: postgres_test
+    environment:
       POSTGRES_DB: test
     ports:
-      - "5433:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - "54321:5432"
+    # No volume for a fresh DB each time
+    profiles: ["test"]
+
+  # DB initialization (shared configuration)
+  db-init:
+    image: oven/bun:latest # we need bun to run the .ts scripts
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+
+    # Development-specific initialization
+  db-init-dev:
+    extends: db-init
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres_dev:5432/curatedotfun
+    depends_on:
+      postgres_dev:
+        condition: service_healthy
+    command: sh -c "bun add -g pnpm && pnpm install && pnpm run db:migrate && pnpm run db:seed:dev"
+    profiles: ["dev"]
+
+  # Test-specific initialization
+  db-init-test:
+    extends: db-init
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres_test:5432/test
+    depends_on:
+      postgres_test:
+        condition: service_healthy
+    command: sh -c "bun add -g pnpm && pnpm install && pnpm run db:migrate && pnpm run db:seed:test"
+    profiles: ["test"]
 
   # Application service
   app:
@@ -39,26 +72,15 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/curatedotfun
+      DATABASE_URL: postgresql://postgres:postgres@postgres_dev:5432/curatedotfun
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
     env_file:
       - ./backend/.env
     ports:
       - "3000:3000"
-
-  # Test service for running tests against PostgreSQL
-  # test:
-  #   build:
-  #     context: .
-  #     dockerfile: test/Dockerfile
-  #   depends_on:
-  #     postgres_test:
-  #       condition: service_healthy
-  #   environment:
-  #     DATABASE_URL: postgresql://postgres:postgres@postgres_test:5432/test
-  #     NODE_ENV: test
-  #   volumes:
-  #     - ./backend/src/__tests__:/app/backend/src/__tests__
-  #     - ./test:/app/test
+    profiles: ["prod"] # we can run the app profile to test a production run
 
 volumes:
   postgres_data:

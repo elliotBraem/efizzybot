@@ -235,7 +235,7 @@ spec:
         - name: run-migrations
           image: ghcr.io/elliotbraem/efizzybot:fe498dcbfed9692a2eaae900c3da066596e6af97
           workingDir: /app/backend
-          command: [ "npm", "run", "db:push" ]
+          command: [ "pnpm", "exec", "drizzle-kit", "migrate", "--config", "drizzle.config.ts" ]
       containers:
         - name: curate-app
           image: ghcr.io/elliotbraem/efizzybot:fe498dcbfed9692a2eaae900c3da066596e6af97

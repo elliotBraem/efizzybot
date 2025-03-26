@@ -100,8 +100,6 @@ export class SubmissionService {
   }
 
   async startMentionsCheck(): Promise<void> {
-    logger.info("Starting submission monitoring...");
-
     // Do an immediate check
     await this.checkMentions();
 

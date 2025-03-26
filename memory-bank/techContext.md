@@ -3,11 +3,13 @@
 ## Technology Stack
 
 ### Backend
-- **Runtime**: Node.js (production), Bun (development)
+- **Runtime**: Node.js (production)
 - **Framework**: Hono
 - **Language**: TypeScript
 - **Database**: PostgreSQL with Drizzle ORM (with DB service abstraction)
 - **Build Tool**: RSPack
+- **Package Manager**: pnpm (with Corepack)
+- **Script Runner**: Bun (for tests and development scripts)
 
 ### Frontend
 - **Framework**: React 18
@@ -27,7 +29,8 @@
 
 ### Core Dependencies
 - Node.js (runtime in production)
-- Bun (package manager and development runtime)
+- pnpm (package manager)
+- Bun (script runner and test runner)
 - Corepack (package manager version management)
 - TypeScript (5.x+)
 - Hono (latest)
@@ -36,9 +39,8 @@
 - RSBuild & RSPack
 - Tailwind CSS
 - Testing Libraries
-  * Jest
-  * Testing Library
-  * Playwright
+  * Bun Test
+  * Nock (for HTTP mocking)
 
 ### Environment Configuration
 - Core Settings
@@ -213,7 +215,7 @@
 - Monorepo with Turborepo
   * Optimized task execution and caching
   * Workspace-aware dependency management
-  * Bun workspace configuration
+  * pnpm workspace configuration
   * Integration testing setup
 - Backend and Frontend as separate workspaces
 - Shared types and utilities
@@ -222,7 +224,7 @@
 
 ### Monorepo Configuration
 - Turborepo for build orchestration and caching
-- Bun workspaces for dependency management
+- pnpm workspaces for dependency management
 - Corepack for package manager version consistency
 - Optimized Docker configuration for monorepo
 - Integration testing infrastructure
