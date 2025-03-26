@@ -13,7 +13,8 @@
     "db:studio": "drizzle-kit studio",
     "db:seed:dev": "bun ./scripts/seed-dev.ts",
     "db:seed:test": "bun ./test/setup/seed-test.ts",
-    "db:migrate-sqlite-to-pg": "pnpm run ./scripts/migrate-sqlite-to-postgres.js"
+    "db:migrate-sqlite-to-pg": "pnpm run ./scripts/migrate-sqlite-to-postgres.js",
+    "test:scheduler": "node scripts/test-scheduler.js"
   },
   "browserslist": {
     "production": [
@@ -52,6 +53,7 @@
     "@types/pg": "^8.11.11",
     "agent-twitter-client": "^0.0.16",
     "async-retry": "^1.3.3",
+    "cron-parser": "^5.0.6",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.1",
     "drizzle-orm": "^0.40.1",

@@ -1,0 +1,263 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "id": "0001_scheduler_tables",
+  "name": "scheduler_tables",
+  "schema": {
+    "enums": {
+      "job_type": {
+        "name": "job_type",
+        "values": ["recap", "custom"]
+      },
+      "job_status": {
+        "name": "job_status",
+        "values": ["pending", "running", "success", "failed"]
+      }
+    },
+    "tables": {
+      "scheduled_jobs": {
+        "name": "scheduled_jobs",
+        "schema": "",
+        "columns": {
+          "id": {
+            "name": "id",
+            "type": "text",
+            "primaryKey": true,
+            "notNull": true
+          },
+          "name": {
+            "name": "name",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": true
+          },
+          "description": {
+            "name": "description",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": false
+          },
+          "job_type": {
+            "name": "job_type",
+            "type": "job_type",
+            "primaryKey": false,
+            "notNull": true
+          },
+          "feed_id": {
+            "name": "feed_id",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": false,
+            "references": {
+              "table": "feeds",
+              "column": "id",
+              "onDelete": "cascade"
+            }
+          },
+          "schedule": {
+            "name": "schedule",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": true
+          },
+          "is_one_time": {
+            "name": "is_one_time",
+            "type": "boolean",
+            "primaryKey": false,
+            "notNull": true,
+            "default": false
+          },
+          "enabled": {
+            "name": "enabled",
+            "type": "boolean",
+            "primaryKey": false,
+            "notNull": true,
+            "default": true
+          },
+          "last_run_at": {
+            "name": "last_run_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": false
+          },
+          "next_run_at": {
+            "name": "next_run_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": false
+          },
+          "config": {
+            "name": "config",
+            "type": "jsonb",
+            "primaryKey": false,
+            "notNull": true
+          },
+          "created_at": {
+            "name": "created_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": true,
+            "default": "NOW()"
+          },
+          "updated_at": {
+            "name": "updated_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": false,
+            "default": "NOW()"
+          }
+        },
+        "indexes": {
+          "scheduled_jobs_feed_idx": {
+            "name": "scheduled_jobs_feed_idx",
+            "columns": ["feed_id"],
+            "isUnique": false
+          },
+          "scheduled_jobs_next_run_idx": {
+            "name": "scheduled_jobs_next_run_idx",
+            "columns": ["next_run_at"],
+            "isUnique": false
+          }
+        },
+        "foreignKeys": {}
+      },
+      "job_executions": {
+        "name": "job_executions",
+        "schema": "",
+        "columns": {
+          "id": {
+            "name": "id",
+            "type": "text",
+            "primaryKey": true,
+            "notNull": true
+          },
+          "job_id": {
+            "name": "job_id",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": true,
+            "references": {
+              "table": "scheduled_jobs",
+              "column": "id",
+              "onDelete": "cascade"
+            }
+          },
+          "started_at": {
+            "name": "started_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": true
+          },
+          "completed_at": {
+            "name": "completed_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": false
+          },
+          "status": {
+            "name": "status",
+            "type": "job_status",
+            "primaryKey": false,
+            "notNull": true
+          },
+          "error": {
+            "name": "error",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": false
+          },
+          "result": {
+            "name": "result",
+            "type": "jsonb",
+            "primaryKey": false,
+            "notNull": false
+          },
+          "duration": {
+            "name": "duration",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": false
+          },
+          "created_at": {
+            "name": "created_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": true,
+            "default": "NOW()"
+          },
+          "updated_at": {
+            "name": "updated_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": false,
+            "default": "NOW()"
+          }
+        },
+        "indexes": {
+          "job_executions_job_idx": {
+            "name": "job_executions_job_idx",
+            "columns": ["job_id"],
+            "isUnique": false
+          },
+          "job_executions_status_idx": {
+            "name": "job_executions_status_idx",
+            "columns": ["status"],
+            "isUnique": false
+          },
+          "job_executions_started_idx": {
+            "name": "job_executions_started_idx",
+            "columns": ["started_at"],
+            "isUnique": false
+          }
+        },
+        "foreignKeys": {}
+      },
+      "scheduler_locks": {
+        "name": "scheduler_locks",
+        "schema": "",
+        "columns": {
+          "lock_id": {
+            "name": "lock_id",
+            "type": "text",
+            "primaryKey": true,
+            "notNull": true
+          },
+          "node_id": {
+            "name": "node_id",
+            "type": "text",
+            "primaryKey": false,
+            "notNull": true
+          },
+          "expires_at": {
+            "name": "expires_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": true
+          },
+          "created_at": {
+            "name": "created_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": true,
+            "default": "NOW()"
+          },
+          "updated_at": {
+            "name": "updated_at",
+            "type": "timestamp",
+            "primaryKey": false,
+            "notNull": false,
+            "default": "NOW()"
+          }
+        },
+        "indexes": {
+          "scheduler_locks_expires_idx": {
+            "name": "scheduler_locks_expires_idx",
+            "columns": ["expires_at"],
+            "isUnique": false
+          }
+        },
+        "foreignKeys": {}
+      }
+    }
+  }
+}

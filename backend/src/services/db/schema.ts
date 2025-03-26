@@ -6,6 +6,8 @@ import {
   text,
   timestamp,
   serial,
+  boolean,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 // From exports/plugins
@@ -124,5 +126,83 @@ export const feedPlugins = table(
     index("feed_plugins_feed_idx").on(table.feedId),
     index("feed_plugins_plugin_idx").on(table.pluginId),
     primaryKey({ columns: [table.feedId, table.pluginId] }), // Ensure one config per plugin per feed
+  ],
+);
+
+// Scheduler Tables
+
+export const JobType = {
+  RECAP: "recap",
+  CUSTOM: "custom",
+} as const;
+
+export type JobType = (typeof JobType)[keyof typeof JobType];
+
+export const JobStatus = {
+  PENDING: "pending",
+  RUNNING: "running",
+  SUCCESS: "success",
+  FAILED: "failed",
+} as const;
+
+export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus];
+
+// Scheduled Jobs Table
+export const scheduledJobs = table(
+  "scheduled_jobs",
+  {
+    id: text("id").primaryKey(), // e.g., "feed:ethereum:recap"
+    name: text("name").notNull(), // Human-readable name
+    description: text("description"),
+    jobType: text("job_type").notNull().$type<JobType>(), // "recap", "custom", etc.
+    feedId: text("feed_id").references(() => feeds.id, { onDelete: "cascade" }), // Associated feed (if applicable)
+    schedule: text("schedule").notNull(), // Cron expression or ISO date
+    isOneTime: boolean("is_one_time").notNull().default(false),
+    enabled: boolean("enabled").notNull().default(true),
+    lastRunAt: timestamp("last_run_at"),
+    nextRunAt: timestamp("next_run_at"),
+    config: jsonb("config").notNull(), // Job-specific configuration
+    ...timestamps,
+  },
+  (table) => [
+    index("scheduled_jobs_feed_idx").on(table.feedId),
+    index("scheduled_jobs_next_run_idx").on(table.nextRunAt),
+  ],
+);
+
+// Job Executions Table
+export const jobExecutions = table(
+  "job_executions",
+  {
+    id: text("id").primaryKey(),
+    jobId: text("job_id")
+      .notNull()
+      .references(() => scheduledJobs.id, { onDelete: "cascade" }),
+    startedAt: timestamp("started_at").notNull(),
+    completedAt: timestamp("completed_at"),
+    status: text("status").notNull().$type<JobStatus>(),
+    error: text("error"),
+    result: jsonb("result"),
+    duration: text("duration"), // In milliseconds
+    ...timestamps,
+  },
+  (table) => [
+    index("job_executions_job_idx").on(table.jobId),
+    index("job_executions_status_idx").on(table.status),
+    index("job_executions_started_idx").on(table.startedAt),
+  ],
+);
+
+// Scheduler Locks Table (for leader election)
+export const schedulerLocks = table(
+  "scheduler_locks",
+  {
+    lockId: text("lock_id").primaryKey(), // e.g., "scheduler_leader"
+    nodeId: text("node_id").notNull(), // Unique ID for the node holding the lock
+    expiresAt: timestamp("expires_at").notNull(), // When the lock expires
+    ...timestamps,
+  },
+  (table) => [
+    index("scheduler_locks_expires_idx").on(table.expiresAt),
   ],
 );

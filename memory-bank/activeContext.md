@@ -34,7 +34,8 @@ Platform Stability, Database Migration, Turborepo Conversion, and Feature Enhanc
    - Expanding distributor plugins
    - Improving transformation capabilities
    - Enhancing curator experience
-   - Developing recap functionality
+   - Implementing recap functionality with scheduled cron jobs
+   - Developing database-driven job scheduling system
 
 5. **Documentation Maintenance**
    - Keeping API documentation current
@@ -53,6 +54,8 @@ Platform Stability, Database Migration, Turborepo Conversion, and Feature Enhanc
 - **Optimized build and development workflow with Turborepo**
 - **Integration testing for backend services with Docker**
 - **Automated testing with GitHub Actions**
+- **Reliable scheduling for recap functionality**
+- **Database-driven job management for future UI integration**
 
 ## Active Decisions
 
@@ -81,6 +84,12 @@ Platform Stability, Database Migration, Turborepo Conversion, and Feature Enhanc
    - Workspace-aware dependency management
    - Improved development workflow
    - Integration testing infrastructure
+6. **Integrated Scheduler for Recap Jobs**
+   - Database-driven job management
+   - Leader election for distributed scheduling
+   - Support for both recurring and one-time jobs
+   - API endpoints for job management
+   - Designed for future UI integration
 
 ### Plugin System
 - Runtime module federation for plugins
@@ -93,6 +102,7 @@ Platform Stability, Database Migration, Turborepo Conversion, and Feature Enhanc
 - Trusted curator moderation
 - Configurable transformation pipeline
 - Multi-channel distribution
+- Scheduled recap generation
 
 ## Current Focus Areas
 1. System reliability and performance
@@ -102,13 +112,18 @@ Platform Stability, Database Migration, Turborepo Conversion, and Feature Enhanc
 5. Plugin ecosystem expansion
 6. Curator experience improvement
 7. Documentation maintenance
+8. **Implementing scheduler for recap functionality**
 
 ## Next Steps
 1. ~~Complete Turborepo conversion~~ ✓
 2. Complete PostgreSQL migration
 3. ~~Implement integration testing for backend services~~ ✓
 4. ~~Optimize Docker configuration for production~~ ✓
-5. Enhance recap functionality
+5. Implement scheduler service for recap functionality
+   - Create database schema for job tracking
+   - Implement leader election for distributed scheduling
+   - Build API endpoints for job management
+   - Integrate with existing recap configuration
 6. Expand distributor options
 7. Improve transformation capabilities
 8. Optimize resource usage

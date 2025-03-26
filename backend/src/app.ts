@@ -5,14 +5,18 @@ import { apiRoutes } from "./routes/api";
 import { configureStaticRoutes, staticRoutes } from "./routes/static";
 import { mockTwitterService } from "./routes/api/test";
 import { ConfigService, isProduction } from "./services/config/config.service";
+import { ConfigSyncService } from "./services/config/config-sync.service";
 import { DistributionService } from "./services/distribution/distribution.service";
 import { PluginService } from "./services/plugins/plugin.service";
 import { ProcessorService } from "./services/processor/processor.service";
+import { SchedulerService } from "./services/scheduler/scheduler.service";
 import { SubmissionService } from "./services/submissions/submission.service";
 import { TransformationService } from "./services/transformation/transformation.service";
 import { TwitterService } from "./services/twitter/client";
 import { AppContext, AppInstance, HonoApp } from "./types/app";
 import { errorHandler } from "./utils/error";
+import { db } from "./services/db";
+import { logger } from "./utils/logger";
 
 const ALLOWED_ORIGINS = [
   "http://localhost:3000",
@@ -58,12 +62,39 @@ export async function createApp(): Promise<AppInstance> {
       )
     : null;
 
+  // Initialize scheduler services
+  const configSyncService = new ConfigSyncService(configService, db);
+  const schedulerService = new SchedulerService(
+    db,
+    configService,
+    processorService,
+    distributionService
+  );
+  
+  // Sync config to database
+  try {
+    await configSyncService.syncRecapConfigs();
+    logger.info("Recap configurations synchronized");
+  } catch (error) {
+    logger.error("Failed to sync recap configurations:", error);
+  }
+  
+  // Start scheduler service
+  try {
+    await schedulerService.start();
+    logger.info("Scheduler service started");
+  } catch (error) {
+    logger.error("Failed to start scheduler service:", error);
+  }
+
   const context: AppContext = {
     twitterService,
     submissionService,
     distributionService,
     processorService,
     configService,
+    schedulerService,
+    configSyncService,
   };
 
   // Create Hono app
@@ -103,5 +134,15 @@ export async function createApp(): Promise<AppInstance> {
     app.route("", staticRoutes);
   }
 
-  return { app, context };
+  return { 
+    app, 
+    context,
+    cleanup: async () => {
+      // Cleanup function to stop services when app is shutting down
+      if (schedulerService) {
+        await schedulerService.stop();
+        logger.info("Scheduler service stopped");
+      }
+    }
+  };
 }
