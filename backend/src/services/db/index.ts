@@ -466,11 +466,11 @@ export class DatabaseService {
     );
   }
 
-  async getLeaderboard(): Promise<queries.LeaderboardEntry[]> {
+  async getLeaderboard(timeRange: string = "all"): Promise<queries.LeaderboardEntry[]> {
     return withErrorHandling(
       async () => {
         return await this.executeWithRetry(async (db) => {
-          return await queries.getLeaderboard(db);
+          return queries.getLeaderboard(db, timeRange);
         }); // Read operation
       },
       { operationName: "get leaderboard" },

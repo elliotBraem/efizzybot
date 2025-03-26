@@ -690,6 +690,8 @@ export interface LeaderboardEntry {
   curatorId: string;
   curatorUsername: string;
   submissionCount: number;
+  approvalCount: number;
+  rejectionCount: number;
   feedSubmissions: FeedSubmissionCount[];
 }
 
@@ -723,28 +725,69 @@ export async function getCuratorsCount(
 
 export async function getLeaderboard(
   db: NodePgDatabase<any>,
+  timeRange: string = "all",
 ): Promise<LeaderboardEntry[]> {
-  // Step 1: Get all curators with their total submission counts
+  // Calculate date range based on timeRange
+  let dateFilter = "";
+  const now = new Date();
+
+  if (timeRange === "month") {
+    // First day of current month
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    dateFilter = `AND s.created_at >= '${firstDayOfMonth.toISOString()}'`;
+  } else if (timeRange === "week") {
+    // Start of current week (Sunday)
+    const firstDayOfWeek = new Date(now);
+    const day = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+    firstDayOfWeek.setDate(now.getDate() - day);
+    firstDayOfWeek.setHours(0, 0, 0, 0);
+    dateFilter = `AND s.created_at >= '${firstDayOfWeek.toISOString()}'`;
+  } else if (timeRange === "today") {
+    // Start of today
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+    dateFilter = `AND s.created_at >= '${startOfDay.toISOString()}'`;
+  }
+
+  interface CuratorRow {
+    curatorId: string;
+    curatorUsername: string;
+    submissionCount: number;
+    approvalCount: number;
+    rejectionCount: number;
+  }
+
   const curatorsResult = await db.execute(sql`
     SELECT 
-      s.curator_id AS curatorid,
-      s.curator_username AS curatorusername,
-      COUNT(DISTINCT s.tweet_id) AS submissioncount
+      s.curator_id AS curatorId,
+      s.curator_username AS curatorUsername,
+      COUNT(DISTINCT s.tweet_id) AS submissionCount,
+      COUNT(DISTINCT CASE WHEN mh.action = 'approve' THEN s.tweet_id END) AS approvalCount,
+      COUNT(DISTINCT CASE WHEN mh.action = 'reject' THEN s.tweet_id END) AS rejectionCount
     FROM 
       submissions s
+    LEFT JOIN 
+      moderation_history mh ON s.tweet_id = mh.tweet_id
+    WHERE 
+      1=1 ${sql.raw(dateFilter)}
     GROUP BY 
       s.curator_id, s.curator_username
     ORDER BY 
       submissioncount DESC
   `);
 
-  const curators = curatorsResult.rows.map((row) => ({
-    curatorId: String(row.curatorid),
-    curatorUsername: String(row.curatorusername),
-    submissionCount: Number(row.submissioncount),
+  const curators = curatorsResult.rows.map((row: any) => ({
+    curatorId: String(row.curatorId),
+    curatorUsername: String(row.curatorUsername),
+    submissionCount: Number(row.submissionCount),
+    approvalCount: Number(row.approvalCount),
+    rejectionCount: Number(row.rejectionCount)
   }));
 
-  // Step 2: Get total submissions per feed
+  // Get total submissions per feed
   const feedTotalsResult = await db.execute(sql`
     SELECT 
       feed_id AS feedid,
@@ -761,7 +804,7 @@ export async function getLeaderboard(
     feedTotalsMap.set(String(row.feedid), Number(row.totalcount));
   }
 
-  // Step 3: For each curator, get their submissions per feed
+  // For each curator, get their submissions per feed
   const result: LeaderboardEntry[] = [];
 
   for (const curator of curators) {
@@ -795,6 +838,8 @@ export async function getLeaderboard(
       curatorId: curator.curatorId,
       curatorUsername: curator.curatorUsername,
       submissionCount: curator.submissionCount,
+      approvalCount: curator.approvalCount,
+      rejectionCount: curator.rejectionCount,
       feedSubmissions,
     });
   }
